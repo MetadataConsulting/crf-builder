@@ -1,24 +1,20 @@
 package org.modelcatalogue.crf.model;
 
-import org.modelcatalogue.crf.model.validation.ValidationConstants;
+import org.modelcatalogue.crf.model.validation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import java.util.*;
 
 import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_ENGLISH_NO_SPACES_PATTERN;
 import static org.modelcatalogue.crf.model.validation.ValidationConstants.WIDTH_DECIMAL_PATTERN;
 
+@ValidDefaultValue
+@ValidWidthDecimal
+@ValidValidationMessage
+@ValidResponseType
 public class Item {
-
-    // TODO: validate default value supported
-    // TODO: validate width decimal
-    // TODO: validate validation error message is present when validation is set
-
 
     Item() {}
 
@@ -464,7 +460,7 @@ public class Item {
      * This field should not be changed in any subsequent versions of the CRF. If you do change it and you are
      * an owner of the CRF the PHI attribute for this item will be changed for all versions of the CRF.
      */
-    @Size(min = 0, max = 1) private Integer phi;
+    @Min(0) @Max(1) private Integer phi;
 
     /**
      * This field determines whether the user must provide a value for it before saving the section the item appears in.
@@ -474,7 +470,7 @@ public class Item {
      * note explaining why the field is left blank. This can be used for any RESPONSE_TYPE
      *
      */
-    @Size(min = 0, max = 1) private Integer required;
+    @Min(0) @Max(1) private Integer required;
 
     /**
      * Used in conjunction with Dynamics in Rules or SIMPLE_CONDITIONAL_DISPLAY. If set to HIDE, the item will not
@@ -780,5 +776,12 @@ public class Item {
 
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
+    }
+
+    public void setCalculation(String calculation) {
+        if (!Arrays.asList(ResponseType.CALCULATION, ResponseType.GROUP_CALCULATION, ResponseType.INSTANT_CALCULATION).contains(responseType)) {
+            throw new IllegalStateException("Cannot set calculation for non-calculation response types.");
+        }
+        this.responseValuesOrCalculations = calculation;
     }
 }

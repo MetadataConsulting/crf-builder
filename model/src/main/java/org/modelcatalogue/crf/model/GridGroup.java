@@ -1,15 +1,15 @@
 package org.modelcatalogue.crf.model;
 
+import org.modelcatalogue.crf.model.validation.ValidRepeat;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@ValidRepeat
 public class GridGroup extends Group {
 
     public GridGroup() {}
-
-    // TODO: validate tha the repeatNum is always lower or equal to repeatMax
-    // TODO: validate that all the items in the group has the same section
 
     /**
      * The value is displayed above the GRID when a user is performing data entry.
