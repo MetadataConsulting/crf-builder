@@ -67,29 +67,84 @@ public class Item {
      * Please note that Datamart treat items in case-insensitive manner. Please treat all ITEM_NAMES as case-insensitive.
      * Also for use with Datamart, Postgres has a list of reserved words and special characters which should not be used
      * as item names.
+     *
+     * This field should be used at all times.
+     *
+     * ITEM_NAME will be used to form the OID and the variable name when exporting data from OpenClinica.
+     * Brevity is recommended for the value as it will be used to generate the unique OC_OID.
+     *
+     * Re-use of the same ITEM_NAME across CRF Versions indicates the variable is the same item. Once created, an item
+     * name cannot be modified within the CRF. See “CRF Versioning” and “Scope of CRFs and Items” in this document
+     * for more detail.
      */
     @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_ENGLISH_NO_SPACES_PATTERN) private String name;
 
     /**
      * The description or definition of the item. Should give an explanation of the data element and the value(s) it
      * captures. It is not shown on the CRF but is in the data dictionary.
+     *
+     * This field must be used at all times.  Provide a description that will help explain what the variable means
+     * and what values it is collecting.
+     *
+     * For example, if the variable were looking to collect HEIGHT, the DESCRIPTION_LABEL would be "This variable
+     * collects the height of the subject.  It captures the value in inches."
+     *
+     * This field should not be changed in any subsequent versions of the CRF. If you do change it  and you are the
+     * owner of the CRF the DESCRIPTION_LABEL attribute for this item will be changed for all versions of the CRF.
      */
     @NotNull @Size(min = 1, max = 4000) private String descriptionLabel;
 
     /**
      * Descriptive text that appears to the left of the input on the CRF. Often phrased in the form of a question, or
      * descriptive label for the form field input.
+     * 
+     * HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;,
+     * italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;,
+     * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
+     * 
+     * This field should be used as a way of describing the expected input to users entering or reviewing CRF data. 
+     * The value of LEFT_ITEM_TEXT is displayed to the left of the form input. 
+     * The text wraps after the first 20 characters.
+     * 
+     * An example question would be “What is the subject’s height?”  Or, a simple one word “Height” suffices as well.
+     * 
+     * If the item is part of a repeating group (GRID), the LEFT_ITEM_TEXT is displayed as a column header above 
+     * the field and not be displayed to the left of the item.
+     * 
      */
     @Size(max = 2000) private String leftItemText;
 
     /**
      * Used to define the type of values being collected.  It appears to the right of the input field on the CRF.
+     *
+     * If you are collecting data in Inches, this field can specify your units as Inches, IN, or in.
+     * This field should not be changed in any subsequent versions of the CRF. If you do change it and you are the owner
+     * of the CRF and no data have been entered for this item, the UNITS attribute for this item will be changed for all
+     * versions of the CRF.
+     *
+     * There are no edit checks associated specifically with units. This will appear as text to right of the input field
+     * and will be displayed between parenthesis.
+     *
+     * If you are exporting to CDISC ODM XML format, this will appear in the metadata as measurement units.
      */
     @Size(max = 64) private String units;
 
     /**
      * Descriptive text that appears to the right of the form input on the CRF, and to the right of any UNITS that are
      * specified too. Often phrased in the form of a question, or supporting instructions for the form field input.
+     *
+     * HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;,
+     * italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;,
+     * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
+     *
+     * This field can be used as a way of describing the expected input to users entering or for field-specific
+     * instructions. The value of RIGHT_ITEM_TEXT is displayed to the right of the form input. The text wraps after
+     * the first 20 characters.
+     *
+     * An example of use of right item text is “If other, please specify”.
+     *
+     * If the item is part of a repeating group (GRID), the RIGHT_ITEM_TEXT will be ignored and never displayed.
+     *
      */
     @Size(max = 2000) private String rightItemText;
 
@@ -100,6 +155,9 @@ public class Item {
      * in the order they are entered in the Template.
      *
      * Every item in the worksheet must be assigned to a section of the CRF.
+     *
+     * For example, all of the information collected as part of a physical exam like Height, Weight, Blood Pressure,
+     * and Heart Rate should be on the same section.
      */
     @NotNull @Valid private Section section;
 
@@ -108,6 +166,27 @@ public class Item {
      * all other items in the group and must be consecutively defined in the ITEMS worksheet.
      *
      * Repeating items are displayed on a single row with the LEFT_ITEM_TEXT (if any exists) as a column header.
+     *
+     * This field should be used to identify whether an item belongs to an item group defined in the GROUPS worksheet.
+     *
+     * If the group is a repeating group (GRID layout), each item in the group is displayed as a column in the grid.
+     * Too many items in a group, or use of long LEFT_ITEM_TEXT values, will make the grid extremely wide and force
+     * the data entry user to scroll the page to the right to complete data entry.
+     *
+     * For non-repeating items, specify a group label to be used to logically assemble related items together for easier
+     * data analysis.
+     *
+     * OpenClinica 3.1.2 and previous versions allowed items to be moved from one item group to another between versions
+     * (i.e. UNGROUPED items could later be grouped). While  OpenClinica allowed this functionality, ODM does not
+     * support this type of structure change between different CRF versions. As a result, these types of structural
+     * changes could break extracts which contain the effected CRF. A new column has been introduced to View CRF page
+     * to allow a user to verify CRF integrity. The new table, called ‘Items’ gives a list of items in a CRF where
+     * the last two columns (‘Version(s)’ and ‘Integrity Check’) provide information about which version(s) the item
+     * belongs to and if the item passes the integrity check (verifying that the item has not been assigned to more than
+     * one item group).
+     *
+     * OpenClinica 3.1.3 and future versions will not allow items to be assigned to different item groups between versions.
+     *
      */
     @Valid private Group group;
 
@@ -115,6 +194,13 @@ public class Item {
      * Contains text that used as a header for a particular item. Using this field will break up the items with
      * a distinct line between the header information and the next set of items. The text is bolded to call greater
      * attention to it.
+     *
+     * HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;,
+     * italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;,
+     * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
+     *
+     * This field can be used as a replacement for left and right item text or as a replacement for instructions.
+     * It allows a greater number of characters, along with bolding the text, to get the data entry person’s attention.
      */
     @Size(max = 2000) private String header;
 
@@ -122,6 +208,14 @@ public class Item {
     /**
      * This field can contain text that will be used underneath the HEADER, or independently of a HEADER being provided.
      * The text will be separated by a line and have a grey background.
+     *
+     * HTML elements are allowed; however, only a limited subset of tags is officially supported (bold &lt;b&gt;,
+     * italics &lt;i&gt;, underline &lt;u&gt;, superscript &lt;sup&gt;, subscript &lt;sub&gt;, line break &lt;br/&gt;,
+     * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
+     *
+     * This field can be used as a replacement or augmentation for left and right item text or as a
+     * replacement/augmentation for section/group instructions.  It allows a greater number of characters, along with
+     * providing a grey background to the text in order to get the data entry user’s attention.
      */
     @Size(max = 240) private String subheader;
 
@@ -136,18 +230,29 @@ public class Item {
      * Assigns items to an item group.  If the group is repeating, the items need to have the same SECTION_LABEL as all
      * other items in the group and must be consecutively defined in the ITEMS worksheet.  Repeating items are displayed
      * on a single row with the LEFT_ITEM_TEXT (if any exists) as a column header.
+     *
+     * This is to be used with only non-repeating items and controls display of multiple items on a single row.
+     * If you set the column to 3 for an item, the previous two items in the worksheet should have COLUMN_NUMBERS
+     * of 1 and 2.  Otherwise, it will just be applied to the first column.
+     *
+     * Use of COLUMN_NUMBERS greater than 3 is not recommended due to typical screen width limitations.
      */
     @Min(1) private Integer columnNumber;
 
     /**
      * The page number on which the section begins. If using paper source documents and have a multi-page CRF,
      * put in the printed page number.
+     *
+     * For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
+     * the data keyed in at a central location performing double data entry.
      */
     @Size(max = 5) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String pageNumber;
 
     /**
      * This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the
      * left of the LEFT_ITEM_TEXT field, or if that field was left blank, to the left of the form input.
+     *
+     * This field allows you to specify questions as 1, 2, 2a etc. in a field.
      */
     @Size(max = 20) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String questionNumber;
 
@@ -160,6 +265,15 @@ public class Item {
     /**
      * Create a custom label associated with a response set. This label must be defined once and may be reused by other i
      * tems with the same responses (e.g. Yes, No) and values.
+     *
+     * In order to facilitate the creation of a CRF, unnecessary duplication of RESPONSE_OPTIONS_TEXT and
+     * RESPONSE_VALUES_OR_CALCULATIONS values can be mitigated by the RESPONSE_LABEL.
+     *
+     * If the same options and values are going to be used for multiple items like Yes, No and 1,2, provide
+     * the information once and enter a unique response label.  This label can be used throughout the rest of the Items
+     * worksheet so other items will use the exact same options and values. If a RESPONSE_LABEL is reused within a CRF,
+     * the RESPONSE_OPTIONS_TEXT and RESPONSE_VALUES_OR_CALCULATIONS must be left blank or exactly match the values of
+     * the original RESPONSE_LABEL in the CRF.
      */
     @Size(max = 80) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String responseLabel;
 
@@ -170,6 +284,7 @@ public class Item {
      * This field is only used for checkbox, multi-select, radio and single-select fields.  This will be the text
      * displayed to the data entry person, which they will choose for each item.  If the options themselves contain
      * commas (,) you must escape the commas with a /
+     *
      */
     @Size(max = 4000) private String responseOptionsText;
 
@@ -195,6 +310,7 @@ public class Item {
      *
      * Instant calculation fields should use this field to define the onchange() function with arguments of an item name
      * (the trigger item) and value.
+     *
      */
     @Size(max = 4000) private String responseValuesOrCalculations;
 
@@ -205,6 +321,7 @@ public class Item {
      *
      * Leaving the field blank and selecting Vertical display the items in a single column from top to bottom.
      * Choosing Horizontal will put the items in a single row, left to right.
+     *
      */
     private ResponseLayout responseLayout;
 
@@ -237,6 +354,11 @@ public class Item {
      * be saved to the database even if the user does not select it.
      */
     @Size(max = 4000) private String defaultValue;
+
+    /**
+     * The data type is the format the value should be supplied in.
+     */
+    @NotNull private DataType dataType;
 
     /**
      * Specify the width (the length of the field) and the number of decimal places to use for the field.
@@ -332,7 +454,7 @@ public class Item {
     /**
      * Signifies whether this item would be considered Protected Health Information.
      *
-     * "Leaving the field blank or selecting 0 means the item would not be considered Protected Health Information.
+     * Leaving the field blank or selecting 0 means the item would not be considered Protected Health Information.
      * This flag does not do anything to mask the data or prevent people from seeing it.
      * The field is used as a label only.
      *
@@ -650,5 +772,13 @@ public class Item {
         values.add(conditionalDisplay.getResponse().getValue());
         values.add(conditionalDisplay.getMessage());
         this.simpleConditionalDisplay = storeResponseOptions(values);
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
     }
 }
