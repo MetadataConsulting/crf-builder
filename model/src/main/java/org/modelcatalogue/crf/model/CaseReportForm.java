@@ -109,4 +109,14 @@ public class CaseReportForm {
     public void setRevisionNotes(String revisionNotes) {
         this.revisionNotes = revisionNotes;
     }
+
+    public Item findItem(String name) {
+        for (Section section : sections.values()) {
+            Item found = section.items.get(name);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
 }

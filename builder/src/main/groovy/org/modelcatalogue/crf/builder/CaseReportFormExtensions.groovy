@@ -1,10 +1,12 @@
 package org.modelcatalogue.crf.builder
 
+import org.modelcatalogue.crf.builder.util.ConditionDelegate
 import org.modelcatalogue.crf.builder.util.RowDelegate
 import org.modelcatalogue.crf.builder.util.ValidationFunctionDelegate
 import org.modelcatalogue.crf.model.Calculation
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.Checkbox
+import org.modelcatalogue.crf.model.ConditionalDisplay
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.DisplayStatus
 import org.modelcatalogue.crf.model.GenericItem
@@ -15,12 +17,15 @@ import org.modelcatalogue.crf.model.HasDefaultValue
 import org.modelcatalogue.crf.model.HasDisplayStatus
 import org.modelcatalogue.crf.model.HasPageNumber
 import org.modelcatalogue.crf.model.HasResponseLayout
+import org.modelcatalogue.crf.model.HasResponseOptions
 import org.modelcatalogue.crf.model.InstantCalculation
+import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ItemContainer
 import org.modelcatalogue.crf.model.MinimalItem
 import org.modelcatalogue.crf.model.MultiSelect
 import org.modelcatalogue.crf.model.Radio
 import org.modelcatalogue.crf.model.ResponseLayout
+import org.modelcatalogue.crf.model.ResponseOption
 import org.modelcatalogue.crf.model.Section
 import org.modelcatalogue.crf.model.SingleSelect
 import org.modelcatalogue.crf.model.Text
@@ -29,6 +34,8 @@ import org.modelcatalogue.crf.model.File as ModelFile
 import org.modelcatalogue.crf.model.validation.ValidationExpression
 
 class CaseReportFormExtensions {
+
+    // TODO calculations
 
     // form extensions
 
@@ -108,6 +115,31 @@ class CaseReportFormExtensions {
         item.validationExpression = new ValidationExpression(new ValidationFunctionDelegate().with(closure), errorMessage)
     }
 
+
+    // responses
+    static void options(HasResponseOptions item, Map<String, Object> values) {
+        item.responseOptions = values.collect { String key, Object value -> new ResponseOption(key, value?.toString()) }
+    }
+
+    // simple display status
+    static void show(MinimalItem item, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=ConditionDelegate) Closure closure) {
+        ConditionDelegate delegate = new ConditionDelegate()
+        delegate.with closure
+
+        Item refItem = item.getSection().getCaseReportForm().findItem(delegate.item)
+
+        if (!refItem) {
+            throw new IllegalArgumentException("Item '$delegate.item' not found for the form!")
+        }
+
+        ResponseOption option = refItem.responseOptions.find { it.value == delegate.value?.toString() }
+
+        if (!option) {
+            throw new IllegalArgumentException("Item '$delegate.item' does not provides any option with value '$delegate.value'!")
+        }
+
+        item.conditionalDisplay = new ConditionalDisplay(option, delegate.stale)
+    }
 
     // group extensions
 

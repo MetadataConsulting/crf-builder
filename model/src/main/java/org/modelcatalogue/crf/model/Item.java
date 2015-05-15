@@ -674,7 +674,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
         List<ResponseOption> options = new ArrayList<ResponseOption>();
 
         for (int i = 0; i < texts.size(); i++) {
-            options.add(new ResponseOption(this, texts.get(i), values.get(i)));
+            options.add(new ResponseOption(this, values.get(i), texts.get(i)));
         }
 
         return options;

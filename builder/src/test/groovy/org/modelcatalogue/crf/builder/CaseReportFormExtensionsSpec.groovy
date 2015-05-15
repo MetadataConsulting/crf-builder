@@ -53,6 +53,7 @@ class CaseReportFormExtensionsSpec extends Specification {
     public static final String RADIO_VALIDATION_MESSAGE = "Value must be lower than or equal to 20."
     public static final String CHECKBOX_VALUE = "checked"
     public static final String CHECKBOX_WIDTH_DECIMAL = "10(3)"
+    public static final String TEXTAREA_DISPLAYED_BUT_SHOULD_BE_HIDDEN = "You have entered the value but this field should no longer be visible!"
 
 
 
@@ -95,12 +96,18 @@ class CaseReportFormExtensionsSpec extends Specification {
 
                     radio(RADIO_NAME) {
                         validate(RADIO_VALIDATION_MESSAGE) { lte(RADIO_MAX) }
+                        options 'First Option'  : 1,
+                                'Best Option'   : 2
                     }
 
                     row {
                         multiSelect(ROW_1_NAME)
                         singleSelect(ROW_2_NAME)
-                        textarea(ROW_3_NAME)
+                        textarea(ROW_3_NAME) {
+                            show {
+                                when RADIO_NAME is 2 otherwise TEXTAREA_DISPLAYED_BUT_SHOULD_BE_HIDDEN
+                            }
+                        }
                     }
                 }
 
@@ -167,6 +174,7 @@ class CaseReportFormExtensionsSpec extends Specification {
         row2.columnNumber == 2
         row3
         row3.columnNumber == 3
+        row3.simpleConditionalDisplay == "$RADIO_NAME,2,$TEXTAREA_DISPLAYED_BUT_SHOULD_BE_HIDDEN".toString()
 
         when:
         Item checkbox = group.items[CHECKBOX_NAME]
@@ -190,8 +198,14 @@ class CaseReportFormExtensionsSpec extends Specification {
         radio.responseType == ResponseType.RADIO
         radio.validation == RADIO_VALIDATION
         radio.validationErrorMessage == RADIO_VALIDATION_MESSAGE
-
-
+        radio.responseOptions
+        radio.responseOptions.size() == 2
+        radio.responseOptions[0].text == 'First Option'
+        radio.responseOptions[0].value == '1'
+        radio.responseOptions[1].text == 'Best Option'
+        radio.responseOptions[1].value == '2'
+        radio.responseOptionsText == 'First Option,Best Option'
+        radio.responseValuesOrCalculations == '1,2'
 
         when:
         Group grid = section.groups[GRID_LABEL]
