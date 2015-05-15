@@ -9,7 +9,7 @@ import org.modelcatalogue.crf.model.ResponseLayout
 class CaseReportFormStaticExtensions {
 
     // form builder
-    static CaseReportForm build(CaseReportForm ignored, String name, @DelegatesTo(CaseReportForm) Closure closure) {
+    static CaseReportForm build(CaseReportForm ignored, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=CaseReportForm) Closure closure) {
         CaseReportForm form = new CaseReportForm(name: name)
         form.with closure
         form

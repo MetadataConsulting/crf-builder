@@ -40,13 +40,20 @@ class CaseReportFormExtensionsSpec extends Specification {
     public static final String TEXT_ITEM_SUBHEADER = "This is a TEXT Item SUBHEADER"
     public static final String TEXT_ITEM_QUESTION_NUMBER = "90B"
     public static final String TEXT_WIDTH_DECIMAL = "50(d)"
+    public static final String REGEXP_VALIDATION = "regexp: /[A-Z]{3}/"
+    public static final String REGEXP_ERROR = "Value should be "
     public static final String ROW_1_NAME = "R1"
     public static final String ROW_2_NAME = "R2"
     public static final String ROW_3_NAME = "R3"
     public static final DataType TEXT_ITEM_DATA_TYPE = DataType.PDATE
     public static final String CHECKBOX_NAME = "check_b_o_x"
+    public static final String RADIO_NAME = "radio_name"
+    public static final int RADIO_MAX = 20
+    public static final String RADIO_VALIDATION = "func: lte(20)"
+    public static final String RADIO_VALIDATION_MESSAGE = "Value must be lower than or equal to 20."
     public static final String CHECKBOX_VALUE = "checked"
     public static final String CHECKBOX_WIDTH_DECIMAL = "10(3)"
+
 
 
 
@@ -81,12 +88,19 @@ class CaseReportFormExtensionsSpec extends Specification {
                         layout horizontal
                         value CHECKBOX_VALUE
                         digits 10, 3
+                        regexp "[A-Z]{3}", REGEXP_ERROR
+                        phi true
+                        required true
+                    }
+
+                    radio(RADIO_NAME) {
+                        validate(RADIO_VALIDATION_MESSAGE) { lte(RADIO_MAX) }
                     }
 
                     row {
-                        text(ROW_1_NAME)
-                        text(ROW_2_NAME)
-                        text(ROW_3_NAME)
+                        multiSelect(ROW_1_NAME)
+                        singleSelect(ROW_2_NAME)
+                        textarea(ROW_3_NAME)
                     }
                 }
 
@@ -163,6 +177,21 @@ class CaseReportFormExtensionsSpec extends Specification {
         checkbox.responseLayout == ResponseLayout.HORIZONTAL
         checkbox.defaultValue == CHECKBOX_VALUE
         checkbox.widthDecimal == CHECKBOX_WIDTH_DECIMAL
+        checkbox.validation == REGEXP_VALIDATION
+        checkbox.validationErrorMessage == REGEXP_ERROR
+        checkbox.phi
+        checkbox.required
+
+        when:
+        Item radio = group.items[RADIO_NAME]
+
+        then:
+        radio
+        radio.responseType == ResponseType.RADIO
+        radio.validation == RADIO_VALIDATION
+        radio.validationErrorMessage == RADIO_VALIDATION_MESSAGE
+
+
 
         when:
         Group grid = section.groups[GRID_LABEL]

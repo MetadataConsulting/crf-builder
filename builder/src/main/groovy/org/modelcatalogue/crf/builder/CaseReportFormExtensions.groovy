@@ -1,6 +1,7 @@
 package org.modelcatalogue.crf.builder
 
 import org.modelcatalogue.crf.builder.util.RowDelegate
+import org.modelcatalogue.crf.builder.util.ValidationFunctionDelegate
 import org.modelcatalogue.crf.model.Calculation
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.Checkbox
@@ -25,6 +26,7 @@ import org.modelcatalogue.crf.model.SingleSelect
 import org.modelcatalogue.crf.model.Text
 import org.modelcatalogue.crf.model.Textarea
 import org.modelcatalogue.crf.model.File as ModelFile
+import org.modelcatalogue.crf.model.validation.ValidationExpression
 
 class CaseReportFormExtensions {
 
@@ -42,7 +44,7 @@ class CaseReportFormExtensions {
         form.revisionNotes = normalize revisionNotes
     }
 
-    static Section section(CaseReportForm form, String label, @DelegatesTo(Section) Closure closure) {
+    static Section section(CaseReportForm form, String label, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Section) Closure closure) {
         Section section = form.section(label)
         section.with closure
         section
@@ -63,13 +65,13 @@ class CaseReportFormExtensions {
         section.instructions = normalize instructions
     }
 
-    static Group group(Section section, String label, @DelegatesTo(Group) Closure closure) {
+    static Group group(Section section, String label, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Group) Closure closure) {
         Group group = section.group(label)
         group.with closure
         group
     }
 
-    static GridGroup grid(Section section, String label, @DelegatesTo(GridGroup) Closure closure) {
+    static GridGroup grid(Section section, String label, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=GridGroup) Closure closure) {
         GridGroup group = section.grid(label)
         group.with closure
         group
@@ -97,6 +99,16 @@ class CaseReportFormExtensions {
         item.defaultValue = value?.toString()
     }
 
+    // validation
+    static void regexp(GenericItem item, String regexp, String errorMessage) {
+        item.validationExpression = new ValidationExpression("regexp: /$regexp/", errorMessage)
+    }
+
+    static void validate(GenericItem item, String errorMessage, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=ValidationFunctionDelegate) Closure<String> closure) {
+        item.validationExpression = new ValidationExpression(new ValidationFunctionDelegate().with(closure), errorMessage)
+    }
+
+
     // group extensions
 
     static void header(GridGroup gridGroup, String header) {
@@ -121,69 +133,69 @@ class CaseReportFormExtensions {
      * @param closure configuration closure
      * @return new text item or modified one if the item of the same name already exists within container
      */
-    static Text text(ItemContainer container, String name, @DelegatesTo(Text) Closure closure) {
+    static Text text(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Text) Closure closure) {
         Text item = container.text(name)
         item.with closure
         item
     }
 
-    static Textarea textarea(ItemContainer container, String name, @DelegatesTo(Textarea) Closure closure) {
+    static Textarea textarea(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Textarea) Closure closure) {
         Textarea item = container.textarea(name)
         item.with closure
         item
     }
 
 
-    static SingleSelect singleSelect(ItemContainer container, String name, @DelegatesTo(SingleSelect) Closure closure) {
+    static SingleSelect singleSelect(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=SingleSelect) Closure closure) {
         SingleSelect item = container.singleSelect(name)
         item.with closure
         item
     }
 
 
-    static Radio radio(ItemContainer container, String name, @DelegatesTo(Radio) Closure closure) {
+    static Radio radio(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Radio) Closure closure) {
         Radio item = container.radio(name)
         item.with closure
         item
     }
 
 
-    static MultiSelect multiSelect(ItemContainer container, String name, @DelegatesTo(MultiSelect) Closure closure) {
+    static MultiSelect multiSelect(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=MultiSelect) Closure closure) {
         MultiSelect item = container.multiSelect(name)
         item.with closure
         item
     }
 
 
-    static Checkbox checkbox(ItemContainer container, String name, @DelegatesTo(Checkbox) Closure closure) {
+    static Checkbox checkbox(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Checkbox) Closure closure) {
         Checkbox item = container.checkbox(name)
         item.with closure
         item
     }
 
 
-    static Calculation calculation(ItemContainer container, String name, @DelegatesTo(Calculation) Closure closure) {
+    static Calculation calculation(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=Calculation) Closure closure) {
         Calculation item = container.calculation(name)
         item.with closure
         item
     }
 
 
-    static GroupCalculation groupCalculation(ItemContainer container, String name, @DelegatesTo(GroupCalculation) Closure closure) {
+    static GroupCalculation groupCalculation(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=GroupCalculation) Closure closure) {
         GroupCalculation item = container.groupCalculation(name)
         item.with closure
         item
     }
 
 
-    static ModelFile file(ItemContainer container, String name, @DelegatesTo(ModelFile) Closure closure) {
+    static ModelFile file(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=ModelFile) Closure closure) {
         ModelFile item = container.file(name)
         item.with closure
         item
     }
 
 
-    static InstantCalculation instantCalculation(ItemContainer container, String name, @DelegatesTo(InstantCalculation) Closure closure) {
+    static InstantCalculation instantCalculation(ItemContainer container, String name, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=InstantCalculation) Closure closure) {
         InstantCalculation item = container.instantCalculation(name)
         item.with closure
         item
@@ -198,7 +210,7 @@ class CaseReportFormExtensions {
      * @throws IllegalArgumentException if the current container is GridGroup as columnNumber is not supported
      * for such group.
      */
-    static void row(ItemContainer container, @DelegatesTo(RowDelegate) Closure closure) {
+    static void row(ItemContainer container, @DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=RowDelegate) Closure closure) {
         if (container instanceof GridGroup) {
             throw new IllegalArgumentException("Cannot put items into row in repeating group")
         }
@@ -243,6 +255,14 @@ class CaseReportFormExtensions {
 
     static void questionNumber(MinimalItem item, String questionNumber) {
         item.questionNumber = normalize questionNumber
+    }
+
+    static void phi(MinimalItem item, boolean phi) {
+        item.phi = phi ? 1 : 0
+    }
+
+    static void required(MinimalItem item, boolean required) {
+        item.required = required ? 1 : 0
     }
 
     static void dataType(GenericItem item, DataType dataType) {
