@@ -14,9 +14,11 @@ import static org.modelcatalogue.crf.model.validation.ValidationConstants.WIDTH_
 @ValidWidthDecimal
 @ValidValidationMessage
 @ValidResponseType
-public class Item {
+public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation {
 
-    Item() {}
+    Item(ResponseType type) {
+        this.responseType = type;
+    }
 
     static String storeResponseOptions(Iterable<String> options) {
         List<String> encoded = new ArrayList<String>();
@@ -216,13 +218,6 @@ public class Item {
     @Size(max = 240) private String subheader;
 
     /**
-     * This field can contain an ITEM_NAME that immediately precedes this item, and is in the same section.
-     *
-     * This will cause the child item to be indented underneath the ITEM_NAME specified
-     */
-    @Valid private Item parent;
-
-    /**
      * Assigns items to an item group.  If the group is repeating, the items need to have the same SECTION_LABEL as all
      * other items in the group and must be consecutively defined in the ITEMS worksheet.  Repeating items are displayed
      * on a single row with the LEFT_ITEM_TEXT (if any exists) as a column header.
@@ -256,7 +251,7 @@ public class Item {
      * The types of responses are based on standard HTML elements web browsers can display in a form. Allowed use of
      * the available RESPONSE_TYPEs depends on the item DATA_TYPE and use of Response Sets.
      */
-    @NotNull private ResponseType responseType;
+    @NotNull private final ResponseType responseType;
 
     /**
      * Create a custom label associated with a response set. This label must be defined once and may be reused by other i
@@ -518,46 +513,57 @@ public class Item {
      */
     private String simpleConditionalDisplay;
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDescriptionLabel() {
         return descriptionLabel;
     }
 
+    @Override
     public void setDescriptionLabel(String descriptionLabel) {
         this.descriptionLabel = descriptionLabel;
     }
 
+    @Override
     public String getLeftItemText() {
         return leftItemText;
     }
 
+    @Override
     public void setLeftItemText(String leftItemText) {
         this.leftItemText = leftItemText;
     }
 
+    @Override
     public String getUnits() {
         return units;
     }
 
+    @Override
     public void setUnits(String units) {
         this.units = units;
     }
 
+    @Override
     public String getRightItemText() {
         return rightItemText;
     }
 
+    @Override
     public void setRightItemText(String rightItemText) {
         this.rightItemText = rightItemText;
     }
 
+    @Override
     public Section getSection() {
         return section;
     }
@@ -566,6 +572,7 @@ public class Item {
         this.section = section;
     }
 
+    @Override
     public Group getGroup() {
         return group;
     }
@@ -574,60 +581,59 @@ public class Item {
         this.group = group;
     }
 
+    @Override
     public String getHeader() {
         return header;
     }
 
+    @Override
     public void setHeader(String header) {
         this.header = header;
     }
 
+    @Override
     public String getSubheader() {
         return subheader;
     }
 
+    @Override
     public void setSubheader(String subheader) {
         this.subheader = subheader;
     }
 
-    public Item getParent() {
-        return parent;
-    }
-
-    void setParent(Item parent) {
-        this.parent = parent;
-    }
-
+    @Override
     public Integer getColumnNumber() {
         return columnNumber;
     }
 
+    @Override
     public void setColumnNumber(Integer columnNumber) {
         this.columnNumber = columnNumber;
     }
 
+    @Override
     public String getPageNumber() {
         return pageNumber;
     }
 
+    @Override
     public void setPageNumber(String pageNumber) {
         this.pageNumber = pageNumber;
     }
 
+    @Override
     public String getQuestionNumber() {
         return questionNumber;
     }
 
+    @Override
     public void setQuestionNumber(String questionNumber) {
         this.questionNumber = questionNumber;
     }
 
+    @Override
     public ResponseType getResponseType() {
         return responseType;
-    }
-
-    public void setResponseType(ResponseType responseType) {
-        this.responseType = responseType;
     }
 
     public String getResponseLabel() {
@@ -646,7 +652,8 @@ public class Item {
         return responseValuesOrCalculations;
     }
 
-    public void setResponseOptions(Iterable<ResponseOption> options) {
+    @Override
+    public void setResponseOptions(List<ResponseOption> options) {
         List<String> texts = new ArrayList<String>();
         List<String> values = new ArrayList<String>();
 
@@ -660,6 +667,7 @@ public class Item {
         this.responseValuesOrCalculations = storeResponseOptions(values);
     }
 
+    @Override
     public List<ResponseOption> getResponseOptions() {
         List<String> texts = parseResponseOptions(this.responseOptionsText);
         List<String> values = parseResponseOptions(this.responseValuesOrCalculations);
@@ -672,26 +680,32 @@ public class Item {
         return options;
     }
 
+    @Override
     public ResponseLayout getResponseLayout() {
         return responseLayout;
     }
 
+    @Override
     public void setResponseLayout(ResponseLayout responseLayout) {
         this.responseLayout = responseLayout;
     }
 
+    @Override
     public String getDefaultValue() {
         return defaultValue;
     }
 
+    @Override
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
+    @Override
     public String getWidthDecimal() {
         return widthDecimal;
     }
 
+    @Override
     public void setWidthDecimal(String widthDecimal) {
         this.widthDecimal = widthDecimal;
     }
@@ -700,38 +714,36 @@ public class Item {
         return validation;
     }
 
-    public void setValidation(String validation) {
-        this.validation = validation;
-    }
-
     public String getValidationErrorMessage() {
         return validationErrorMessage;
     }
 
-    public void setValidationErrorMessage(String validationErrorMessage) {
-        this.validationErrorMessage = validationErrorMessage;
-    }
-
+    @Override
     public Integer getPhi() {
         return phi;
     }
 
+    @Override
     public void setPhi(Integer phi) {
         this.phi = phi;
     }
 
+    @Override
     public Integer getRequired() {
         return required;
     }
 
+    @Override
     public void setRequired(Integer required) {
         this.required = required;
     }
 
+    @Override
     public DisplayStatus getDisplayStatus() {
         return displayStatus;
     }
 
+    @Override
     public void setDisplayStatus(DisplayStatus displayStatus) {
         this.displayStatus = displayStatus;
     }
@@ -740,6 +752,7 @@ public class Item {
         return simpleConditionalDisplay;
     }
 
+    @Override
     public ConditionalDisplay getConditionalDisplay() {
         if (simpleConditionalDisplay == null) {
             return null;
@@ -762,6 +775,7 @@ public class Item {
         return new ConditionalDisplay(option, parts.get(2));
     }
 
+    @Override
     public void setConditionalDisplay(ConditionalDisplay conditionalDisplay) {
         List<String> values = new ArrayList<String>();
         values.add(conditionalDisplay.getResponse().getItem().getName());
@@ -770,18 +784,37 @@ public class Item {
         this.simpleConditionalDisplay = storeResponseOptions(values);
     }
 
+    @Override
     public DataType getDataType() {
         return dataType;
     }
 
+    @Override
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 
+    @Override
     public void setCalculation(String calculation) {
         if (!Arrays.asList(ResponseType.CALCULATION, ResponseType.GROUP_CALCULATION, ResponseType.INSTANT_CALCULATION).contains(responseType)) {
             throw new IllegalStateException("Cannot set calculation for non-calculation response types.");
         }
         this.responseValuesOrCalculations = calculation;
+    }
+
+    @Override
+    public String getCalculation() {
+        return this.responseValuesOrCalculations;
+    }
+
+    @Override
+    public ValidationExpression getValidationExpression() {
+        return new ValidationExpression(validation, validationErrorMessage);
+    }
+
+    @Override
+    public void setValidationExpression(ValidationExpression expression) {
+        this.validation = expression.getExpression();
+        this.validationErrorMessage = expression.getMessage();
     }
 }

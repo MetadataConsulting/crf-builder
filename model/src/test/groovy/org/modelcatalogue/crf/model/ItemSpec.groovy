@@ -1,6 +1,7 @@
 package org.modelcatalogue.crf.model
 
 import org.modelcatalogue.crf.model.validation.Validation
+import org.modelcatalogue.crf.model.validation.ValidationExpression
 import org.springframework.validation.Errors
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -31,7 +32,7 @@ class ItemSpec extends Specification {
     }
 
     def "store response options"() {
-        Item item = new Item()
+        Item item = new Item(ResponseType.SINGLE_SELECT)
         item.responseOptions = [
                 new ResponseOption('Male', 'm'),
                 new ResponseOption('Female', 'f')
@@ -58,14 +59,14 @@ class ItemSpec extends Specification {
 
 
     def "test missing validation message"() {
-        Errors errors = Validation.validate(Item, validation: "gt(1)")
+        Errors errors = Validation.validate(Item, validationExpression: new ValidationExpression("gt(1)", null))
 
         expect:
         errors.globalError?.code == 'ValidValidationMessage'
     }
 
     def "test present validation message"() {
-        Errors errors = Validation.validate(Item, validation: "gt(1)", validationErrorMessage: 'Must be greater 1.')
+        Errors errors = Validation.validate(Item, validationExpression: new ValidationExpression("gt(1)",  'Must be greater 1.'))
 
         expect:
         errors.globalError?.code != 'ValidValidationMessage'

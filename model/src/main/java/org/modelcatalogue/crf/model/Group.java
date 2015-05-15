@@ -5,11 +5,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import java.util.*;
-
 import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_NO_SPACES_PATTERN;
 
-public class Group {
+public class Group extends AbstractItemsContainer implements HasDisplayStatus {
 
     Group() {}
 
@@ -52,16 +50,7 @@ public class Group {
      */
     @NotNull @Valid private Section section;
 
-    private Map<String, Item> items = new LinkedHashMap<String, Item>();
-
-    public Item item(String name) {
-        Item item = new Item();
-        item.setName(name);
-        addItem(item);
-        return item;
-    }
-
-    Item addItem(Item item) {
+    protected Item addItem(Item item) {
         if (!items.containsKey(item.getName())) {
             items.put(item.getName(), item);
             item.setGroup(this);
@@ -69,10 +58,6 @@ public class Group {
             this.getSection().addItem(item);
         }
         return item;
-    }
-
-    public Map<String, Item> getItems() {
-        return Collections.unmodifiableMap(items);
     }
 
     public String getLabel() {

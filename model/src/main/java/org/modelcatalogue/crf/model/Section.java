@@ -8,7 +8,7 @@ import java.util.*;
 
 import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_NO_SPACES_PATTERN;
 
-public class Section {
+public class Section extends AbstractItemsContainer implements HasPageNumber {
 
     Section() {}
 
@@ -69,25 +69,12 @@ public class Section {
 
     private CaseReportForm caseReportForm;
 
-    private Map<String, Item> items = new LinkedHashMap<String, Item>();
-
-    public Item item(String name) {
-        Item item = new Item();
-        item.setName(name);
-        addItem(item);
-        return item;
-    }
-
-    Item addItem(Item item) {
+    protected Item addItem(Item item) {
         if (!items.containsKey(item.getName())) {
             items.put(item.getName(), item);
             item.setSection(this);
         }
         return item;
-    }
-
-    public Map<String, Item> getItems() {
-        return Collections.unmodifiableMap(items);
     }
 
     private Map<String, Group> groups = new LinkedHashMap<String, Group>();
@@ -109,7 +96,7 @@ public class Section {
      * @param label label of the new repeating grid group.
      * @return new repeating grid group with given label.
      */
-    public GridGroup gridGroup(String label) {
+    public GridGroup grid(String label) {
         GridGroup group = new GridGroup();
         group.setLabel(label);
         addGroup(group);
