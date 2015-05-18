@@ -7,34 +7,34 @@ public enum ResponseType {
     /**
      * Text is a rectangular box to enter information.
      */
-    TEXT,
+    TEXT("text"),
 
     /**
      *  Textarea is a larger box where more information is visible to the person viewing the form with data.
      */
-    TEXTAREA,
+    TEXTAREA("textarea"),
 
     /**
      * Single-Select onlyS allow one option to be chosen for an item.
      */
-    SINGLE_SELECT,
+    SINGLE_SELECT("single-select"),
 
     /**
      * Radio only allowS one option to be chosen for an item.
      *
      * Radio buttons cannot be deselected in the user interface once an option has been chosen.
      */
-    RADIO,
+    RADIO("radio"),
 
     /**
      * Multi-Select allowS multiple options to be selected at once.
      */
-    MULTI_SELECT,
+    MULTI_SELECT("multi-select"),
 
     /**
      * Checkbox allowS multiple options to be selected at once.
      */
-    CHECKBOX,
+    CHECKBOX("checkbox"),
 
     /**
      * Calculation is used to derive values. Calculations allow for the execution of arithmetic expressions and support
@@ -45,7 +45,7 @@ public enum ResponseType {
      *
      * Forced reason for change (when turned on) is not enforced for calculated fields.
      */
-    CALCULATION,
+    CALCULATION("calculation"),
 
     /**
      * Group-calculation is used to derive values. Group-calculation allow for the execution of arithmetic expressions
@@ -60,19 +60,29 @@ public enum ResponseType {
      *
      * Forced reason for change (when turned on) is not enforced for calculated fields.
      */
-    GROUP_CALCULATION,
+    GROUP_CALCULATION("group-calculation"),
 
     /**
      * File allows a file to be uploaded and attached to the CRF by the data entry person.
      */
-    FILE,
+    FILE("file"),
 
     /**
      * Instant-calculation (introduced in 3.1.3) is used to populate a destination field with date/time information when
      * content of a parent field is changed. The trigger field must precede the instant-calculation field.  This is
      * a client side action; it is executed by triggering on change function defined by the CRF designer in the
      */
-    INSTANT_CALCULATION;
+    INSTANT_CALCULATION("instant-calculation");
+
+    private final String excelValue;
+
+    ResponseType(String excelValue) {
+        this.excelValue = excelValue;
+    }
+
+    public String getExcelValue() {
+        return excelValue;
+    }
 
     public boolean isSupportingDefaultValue() {
         return Arrays.asList(TEXT, TEXTAREA, SINGLE_SELECT, MULTI_SELECT, CHECKBOX).contains(this);

@@ -1,1 +1,1 @@
-include 'model', 'builder'
+include 'model', 'builder', 'serializer'
