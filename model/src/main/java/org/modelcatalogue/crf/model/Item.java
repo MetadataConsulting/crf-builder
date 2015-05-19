@@ -16,6 +16,9 @@ import static org.modelcatalogue.crf.model.validation.ValidationConstants.WIDTH_
 @ValidResponseType
 public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation {
 
+    private static final String CALCULATION_RESPONSE_OPTIONS_TEXT = "calculation";
+    private static final String RESPONSE_LABEL_SUFFIX = "_RL";
+
     Item(ResponseType type) {
         this.responseType = type;
     }
@@ -23,15 +26,15 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
     static String storeResponseOptions(Iterable<String> options) {
         List<String> encoded = new ArrayList<String>();
         for (String option : options) {
-            encoded.add(option.replaceAll(",", "/,"));
+            encoded.add(option.replaceAll(",", "\\\\\\\\,"));
         }
         return join(encoded, ",");
     }
 
     static List<String> parseResponseOptions(String options) {
         List<String> parsed = new ArrayList<String>();
-        for (String option : options.split("\\s*(?<!/),\\s*")) {
-            parsed.add(option.replaceAll("/,", ","));
+        for (String option : options.split("\\s*(?<!\\\\),\\s*")) {
+            parsed.add(option.replaceAll("\\\\\\\\,", ","));
         }
         return Collections.unmodifiableList(parsed);
     }
@@ -663,6 +666,9 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
             values.add(option.getValue());
         }
 
+        if (this.responseLabel == null && this.name != null) {
+            this.responseLabel = this.name + RESPONSE_LABEL_SUFFIX;
+        }
         this.responseOptionsText = storeResponseOptions(texts);
         this.responseValuesOrCalculations = storeResponseOptions(values);
     }
@@ -799,6 +805,10 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
         if (!Arrays.asList(ResponseType.CALCULATION, ResponseType.GROUP_CALCULATION, ResponseType.INSTANT_CALCULATION).contains(responseType)) {
             throw new IllegalStateException("Cannot set calculation for non-calculation response types.");
         }
+        if (this.responseLabel == null && this.name != null) {
+            this.responseLabel = this.name + RESPONSE_LABEL_SUFFIX;
+        }
+        this.responseOptionsText = CALCULATION_RESPONSE_OPTIONS_TEXT;
         this.responseValuesOrCalculations = calculation;
     }
 

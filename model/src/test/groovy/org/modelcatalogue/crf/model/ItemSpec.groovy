@@ -14,9 +14,9 @@ class ItemSpec extends Specification {
         options == Item.parseResponseOptions(string)
 
         where:
-        string  | options
-        'a,b,c' | ['a','b','c']
-        'a/,b,c'| ['a,b','c']
+        string      | options
+        'a,b,c'     | ['a','b','c']
+        'a\\\\,b,c' | ['a,b','c']
     }
 
     @Unroll
@@ -25,9 +25,9 @@ class ItemSpec extends Specification {
         string == Item.storeResponseOptions(options)
 
         where:
-        string  | options
-        'a,b,c' | ['a','b','c']
-        'a/,b,c'| ['a,b','c']
+        string      | options
+        'a,b,c'     | ['a','b','c']
+        'a\\\\,b,c' | ['a,b','c']
 
     }
 

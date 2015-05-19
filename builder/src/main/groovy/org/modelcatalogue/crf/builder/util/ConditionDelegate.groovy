@@ -12,7 +12,7 @@ class ConditionDelegate {
     }
 
     ConditionDelegate is(Object value) {
-        this.value = value
+        this.value = value?.toString()
         this
     }
 

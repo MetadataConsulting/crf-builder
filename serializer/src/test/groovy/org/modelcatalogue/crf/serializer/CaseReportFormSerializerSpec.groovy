@@ -1,9 +1,11 @@
 package org.modelcatalogue.crf.serializer
 
 import org.apache.poi.hssf.usermodel.HSSFCell
+import org.apache.poi.hssf.usermodel.HSSFCellStyle
 import org.apache.poi.hssf.usermodel.HSSFRow
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.hssf.util.HSSFColor
 import org.modelcatalogue.crf.model.CaseReportForm
 import spock.lang.Shared
 import spock.lang.Specification
@@ -13,13 +15,7 @@ class CaseReportFormSerializerSpec extends Specification {
     @Shared HSSFWorkbook workbook
 
     def setupSpec() {
-        CaseReportForm form = buildTestForm()
-
-        ByteArrayOutputStream output = new ByteArrayOutputStream()
-        new CaseReportFormSerializer(form).write(output)
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray())
-        workbook = new HSSFWorkbook(input)
+        workbook = serialize buildTestForm()
     }
 
     def "CRF sheet is written"() {
@@ -100,6 +96,22 @@ class CaseReportFormSerializerSpec extends Specification {
         sectionInstructionsHeading
         sectionPageNumberHeading
         sectionParentSectionHeading
+
+        sectionLabelHeading.cellStyle.fillForegroundColor == HSSFColor.SKY_BLUE.index
+        sectionLabelHeading.cellStyle.fillPattern == HSSFCellStyle.SOLID_FOREGROUND
+        sectionLabelHeading.cellStyle.borderBottom == HSSFCellStyle.BORDER_THIN
+        sectionLabelHeading.cellStyle.borderTop == HSSFCellStyle.BORDER_THIN
+        sectionLabelHeading.cellStyle.borderLeft == HSSFCellStyle.BORDER_THIN
+        sectionLabelHeading.cellStyle.borderRight != HSSFCellStyle.BORDER_THIN
+        sectionInstructionsHeading.cellStyle.borderBottom == HSSFCellStyle.BORDER_THIN
+        sectionInstructionsHeading.cellStyle.borderTop == HSSFCellStyle.BORDER_THIN
+        sectionInstructionsHeading.cellStyle.borderLeft != HSSFCellStyle.BORDER_THIN
+        sectionInstructionsHeading.cellStyle.borderRight != HSSFCellStyle.BORDER_THIN
+        sectionParentSectionHeading.cellStyle.borderBottom == HSSFCellStyle.BORDER_THIN
+        sectionParentSectionHeading.cellStyle.borderTop == HSSFCellStyle.BORDER_THIN
+        sectionParentSectionHeading.cellStyle.borderLeft != HSSFCellStyle.BORDER_THIN
+        sectionParentSectionHeading.cellStyle.borderRight == HSSFCellStyle.BORDER_THIN
+
 
         when:
         HSSFRow section1Row = sectionsSheet.getRow(sectionsSheet.firstRowNum + 1)
@@ -369,11 +381,222 @@ class CaseReportFormSerializerSpec extends Specification {
         pedatRequired
         pedatDisplayStatus
         pedatSimpleConditional
+
+        when:
+        HSSFRow appearenceRow = itemsSheet.getRow(itemsSheet.firstRowNum + 2)
+
+        then:
+        appearenceRow
+
+        when:
+        HSSFCell appeareanceName = appearenceRow.getCell(itemNameHeading.columnIndex)
+        HSSFCell appeareanceDescription = appearenceRow.getCell(itemDescriptionHeading.columnIndex)
+        HSSFCell appeareanceLeftItem = appearenceRow.getCell(itemLeftItemTextHeading.columnIndex)
+        HSSFCell appeareanceUnit = appearenceRow.getCell(itemUnitHeading.columnIndex)
+        HSSFCell appeareanceRightItem = appearenceRow.getCell(itemRightItemHeading.columnIndex)
+        HSSFCell appeareanceSection = appearenceRow.getCell(itemSectionHeading.columnIndex)
+        HSSFCell appeareanceGroupLabel = appearenceRow.getCell(itemGroupLabelHeading.columnIndex)
+        HSSFCell appeareanceHeader = appearenceRow.getCell(itemHeaderHeading.columnIndex)
+        HSSFCell appeareanceSubheader = appearenceRow.getCell(itemSubheaderHeading.columnIndex)
+        HSSFCell appeareanceParentItem = appearenceRow.getCell(itemParentItemHeading.columnIndex)
+        HSSFCell appeareanceColumnNumber = appearenceRow.getCell(itemColumnNumberHeading.columnIndex)
+        HSSFCell appeareancePageNumber = appearenceRow.getCell(itemPageNumberHeading.columnIndex)
+        HSSFCell appeareanceQuestionNumber = appearenceRow.getCell(itemQuestionNumberHeading.columnIndex)
+        HSSFCell appeareanceResponseType = appearenceRow.getCell(itemResponseTypeHeading.columnIndex)
+        HSSFCell appeareanceResponseLabel = appearenceRow.getCell(itemResponseLabelHeading.columnIndex)
+        HSSFCell appeareanceResponseOptions = appearenceRow.getCell(itemResponseOptionsHeading.columnIndex)
+        HSSFCell appeareanceResponseValuesOrCalculation = appearenceRow.getCell(itemResponseValuesOrCalculationHeading.columnIndex)
+        HSSFCell appeareanceResponseLayout = appearenceRow.getCell(itemResponseLayoutHeading.columnIndex)
+        HSSFCell appeareanceDefaultValue = appearenceRow.getCell(itemDefaultValueHeading.columnIndex)
+        HSSFCell appeareanceDataType = appearenceRow.getCell(itemDataTypeHeading.columnIndex)
+        HSSFCell appeareanceWidthDecimal = appearenceRow.getCell(itemWidthDecimalHeading.columnIndex)
+        HSSFCell appeareanceValidation = appearenceRow.getCell(itemValidationHeading.columnIndex)
+        HSSFCell appeareanceValidationErrorMessage = appearenceRow.getCell(itemValidationErrorMessageHeading.columnIndex)
+        HSSFCell appeareancePhi = appearenceRow.getCell(itemPhiHeading.columnIndex)
+        HSSFCell appeareanceRequired = appearenceRow.getCell(itemRequiredHeading.columnIndex)
+        HSSFCell appeareanceDisplayStatus = appearenceRow.getCell(itemDisplayStatusHeading.columnIndex)
+        HSSFCell appeareanceSimpleConditional = appearenceRow.getCell(itemSimpleConditionalHeading.columnIndex)
+
+        then:
+        appeareanceName
+        appeareanceName.stringCellValue == ITEM_NAME_2
+        appeareanceDescription
+        appeareanceDescription.stringCellValue == ITEM_DESCRIPTION_LABEL_2
+        appeareanceLeftItem
+        appeareanceLeftItem.stringCellValue == ITEM_LEFT_ITEM_TEXT_2
+        appeareanceUnit
+        appeareanceRightItem
+        appeareanceSection
+        appeareanceSection.stringCellValue == SECTION_LABEL_2
+        appeareanceGroupLabel
+        appeareanceHeader
+        appeareanceHeader.stringCellValue == ITEM_HEADER_2
+        appeareanceSubheader
+        appeareanceSubheader.stringCellValue == ITEM_SUBHEADER_2
+        appeareanceParentItem
+        appeareanceColumnNumber
+        appeareanceColumnNumber.cellType == HSSFCell.CELL_TYPE_NUMERIC
+        appeareanceColumnNumber.numericCellValue == ITEM_COLUMN_NUMBER_2
+        appeareancePageNumber
+        appeareanceQuestionNumber
+        appeareanceQuestionNumber.stringCellValue == ITEM_QUESTION_NUMBER_2
+        appeareanceResponseType
+        appeareanceResponseType.stringCellValue == ITEM_RESPONSE_TYPE_2
+        appeareanceResponseLabel
+        appeareanceResponseLabel.stringCellValue == ITEM_NAME_2 + RESPONSE_LABEL_SUFFIX
+        appeareanceResponseOptions
+        appeareanceResponseOptions.stringCellValue == ITEM_RESPONSE_OPTIONS_TEXT_2
+        appeareanceResponseValuesOrCalculation
+        appeareanceResponseValuesOrCalculation.stringCellValue == ITEM_RESPONSE_VALUES_OR_CALCULATIONS_2
+        appeareanceResponseLayout
+        appeareanceDefaultValue
+        appeareanceDefaultValue.stringCellValue == ITEM_DEFAULT_VALUE_2
+        appeareanceDataType
+        appeareanceDataType.stringCellValue == ITEM_DATA_TYPE_2
+        appeareanceWidthDecimal
+        appeareanceValidation
+        appeareanceValidationErrorMessage
+        appeareancePhi
+        appeareanceRequired
+        appeareanceRequired.cellType == HSSFCell.CELL_TYPE_NUMERIC
+        appeareanceRequired.numericCellValue == ITEM_REQUIRED_2
+        appeareanceDisplayStatus
+        appeareanceSimpleConditional
+
+        when:
+        HSSFRow appearenceCommentsRow = itemsSheet.getRow(itemsSheet.firstRowNum + 3)
+
+        then:
+        appearenceCommentsRow
+
+        when:
+        HSSFCell appeareanceCommentsName = appearenceCommentsRow.getCell(itemNameHeading.columnIndex)
+        HSSFCell appeareanceCommentsDescription = appearenceCommentsRow.getCell(itemDescriptionHeading.columnIndex)
+        HSSFCell appeareanceCommentsLeftItem = appearenceCommentsRow.getCell(itemLeftItemTextHeading.columnIndex)
+        HSSFCell appeareanceCommentsUnit = appearenceCommentsRow.getCell(itemUnitHeading.columnIndex)
+        HSSFCell appeareanceCommentsRightItem = appearenceCommentsRow.getCell(itemRightItemHeading.columnIndex)
+        HSSFCell appeareanceCommentsSection = appearenceCommentsRow.getCell(itemSectionHeading.columnIndex)
+        HSSFCell appeareanceCommentsGroupLabel = appearenceCommentsRow.getCell(itemGroupLabelHeading.columnIndex)
+        HSSFCell appeareanceCommentsHeader = appearenceCommentsRow.getCell(itemHeaderHeading.columnIndex)
+        HSSFCell appeareanceCommentsSubheader = appearenceCommentsRow.getCell(itemSubheaderHeading.columnIndex)
+        HSSFCell appeareanceCommentsParentItem = appearenceCommentsRow.getCell(itemParentItemHeading.columnIndex)
+        HSSFCell appeareanceCommentsColumnNumber = appearenceCommentsRow.getCell(itemColumnNumberHeading.columnIndex)
+        HSSFCell appeareanceCommentsPageNumber = appearenceCommentsRow.getCell(itemPageNumberHeading.columnIndex)
+        HSSFCell appeareanceCommentsQuestionNumber = appearenceCommentsRow.getCell(itemQuestionNumberHeading.columnIndex)
+        HSSFCell appeareanceCommentsResponseType = appearenceCommentsRow.getCell(itemResponseTypeHeading.columnIndex)
+        HSSFCell appeareanceCommentsResponseLabel = appearenceCommentsRow.getCell(itemResponseLabelHeading.columnIndex)
+        HSSFCell appeareanceCommentsResponseOptions = appearenceCommentsRow.getCell(itemResponseOptionsHeading.columnIndex)
+        HSSFCell appeareanceCommentsResponseValuesOrCalculation = appearenceCommentsRow.getCell(itemResponseValuesOrCalculationHeading.columnIndex)
+        HSSFCell appeareanceCommentsResponseLayout = appearenceCommentsRow.getCell(itemResponseLayoutHeading.columnIndex)
+        HSSFCell appeareanceCommentsDefaultValue = appearenceCommentsRow.getCell(itemDefaultValueHeading.columnIndex)
+        HSSFCell appeareanceCommentsDataType = appearenceCommentsRow.getCell(itemDataTypeHeading.columnIndex)
+        HSSFCell appeareanceCommentsWidthDecimal = appearenceCommentsRow.getCell(itemWidthDecimalHeading.columnIndex)
+        HSSFCell appeareanceCommentsValidation = appearenceCommentsRow.getCell(itemValidationHeading.columnIndex)
+        HSSFCell appeareanceCommentsValidationErrorMessage = appearenceCommentsRow.getCell(itemValidationErrorMessageHeading.columnIndex)
+        HSSFCell appeareanceCommentsPhi = appearenceCommentsRow.getCell(itemPhiHeading.columnIndex)
+        HSSFCell appeareanceCommentsRequired = appearenceCommentsRow.getCell(itemRequiredHeading.columnIndex)
+        HSSFCell appeareanceCommentsDisplayStatus = appearenceCommentsRow.getCell(itemDisplayStatusHeading.columnIndex)
+        HSSFCell appeareanceCommentsSimpleConditional = appearenceCommentsRow.getCell(itemSimpleConditionalHeading.columnIndex)
+
+        then:
+        appeareanceCommentsName
+        appeareanceCommentsName.stringCellValue == ITEM_NAME_3
+        appeareanceCommentsDescription
+        appeareanceCommentsDescription.stringCellValue == ITEM_DESCRIPTION_LABEL_3
+        appeareanceCommentsLeftItem
+        appeareanceCommentsLeftItem.stringCellValue == ITEM_LEFT_ITEM_TEXT_3
+        appeareanceCommentsUnit
+        appeareanceCommentsRightItem
+        appeareanceCommentsSection
+        appeareanceCommentsSection.stringCellValue == SECTION_LABEL_2
+        appeareanceCommentsGroupLabel
+        appeareanceCommentsHeader
+        appeareanceCommentsSubheader
+        appeareanceCommentsParentItem
+        appeareanceCommentsColumnNumber
+        appeareanceCommentsColumnNumber.cellType == HSSFCell.CELL_TYPE_NUMERIC
+        appeareanceCommentsColumnNumber.numericCellValue == ITEM_COLUMN_NUMBER_3
+        appeareanceCommentsPageNumber
+        appeareanceCommentsQuestionNumber
+        appeareanceCommentsResponseType
+        appeareanceCommentsResponseType.stringCellValue == ITEM_RESPONSE_TYPE_3
+        appeareanceCommentsResponseLabel
+        appeareanceCommentsResponseOptions
+        appeareanceCommentsResponseValuesOrCalculation
+        appeareanceCommentsResponseLayout
+        appeareanceCommentsDefaultValue
+        appeareanceCommentsDataType
+        appeareanceCommentsDataType.stringCellValue == ITEM_DATA_TYPE_3
+        appeareanceCommentsWidthDecimal
+        appeareanceCommentsValidation
+        appeareanceCommentsValidationErrorMessage
+        appeareanceCommentsPhi
+        appeareanceCommentsRequired
+        appeareanceCommentsDisplayStatus
+        appeareanceCommentsDisplayStatus.stringCellValue == ITEM_DISPLAY_STATUS_3
+        appeareanceCommentsSimpleConditional
+        appeareanceCommentsSimpleConditional.stringCellValue == ITEM_SIMPLE_CONDITIONAL_DISPLAY_3
+    }
+
+    def "version present on instructions sheet"() {
+        when:
+        HSSFSheet instructionsSheet = workbook.getSheet(INSTRUCTIONS_SHEET)
+
+        then:
+        instructionsSheet
+
+        when:
+        HSSFRow instructionsInfoRow = instructionsSheet.getRow(INSTRUCTIONS_INFO_ROW)
+
+        then:
+        instructionsInfoRow
+
+        when:
+        HSSFCell instructionsInfoCell = instructionsInfoRow.getCell(INSTRUCTIONS_INFO_COL)
+
+        then:
+        instructionsInfoCell
+        instructionsInfoCell.stringCellValue == INSTRUCTIONS_INFO
+
+        when:
+        HSSFRow instructionsVersionRow = instructionsSheet.getRow(INSTRUCTIONS_VERSION_ROW)
+
+        then:
+        instructionsVersionRow
+
+        when:
+        HSSFCell instructionsVersionCell = instructionsVersionRow.getCell(INSTRUCTIONS_VERSION_COL)
+
+        then:
+        instructionsVersionCell
+        instructionsVersionCell.stringCellValue == INSTRUCTIONS_VERSION
     }
 
     def "write example sheet"() {
         when:
         File file = new File(System.getProperty('java.io.tmpdir'), 'crf-builder/example.xls')
+        if (file.parentFile.exists()) {
+            file.parentFile.deleteDir()
+        }
+        file.parentFile.mkdirs()
+        file.createNewFile()
+
+        workbook.write(new FileOutputStream(file))
+        println "example file written to ${file.absolutePath}"
+
+        then:
+        noExceptionThrown()
+    }
+
+    def "complex form"() {
+        URL complexFormFileURL = CaseReportFormSerializerSpec.getResource('samplePhysicalExamEnglish.crf')
+
+        expect:
+        complexFormFileURL
+
+        when:
+        HSSFWorkbook workbook = serialize CaseReportForm.load(new File(complexFormFileURL.toURI()))
+        File file = new File(System.getProperty('java.io.tmpdir'), 'crf-builder/complexExample.xls')
         if (file.parentFile.exists()) {
             file.parentFile.deleteDir()
         }
@@ -465,6 +688,8 @@ class CaseReportFormSerializerSpec extends Specification {
     private static final String ITEM_DISPLAY_STATUS = "ITEM_DISPLAY_STATUS";
     private static final String ITEM_SIMPLE_CONDITIONAL_DISPLAY = "SIMPLE_CONDITIONAL_DISPLAY";
 
+    private static final String RESPONSE_LABEL_SUFFIX = '_RL'
+
     private static final String ITEM_NAME_1 = "PEDAT";
     private static final String ITEM_DESCRIPTION_LABEL_1 = "Date of Physical Exam";
     private static final String ITEM_LEFT_ITEM_TEXT_1 = "Date of Physical Examination:";
@@ -473,6 +698,39 @@ class CaseReportFormSerializerSpec extends Specification {
     private static final String ITEM_QUESTION_NUMBER_1 = "1";
     private static final String ITEM_RESPONSE_TYPE_1 = "text";
     private static final String ITEM_DATA_TYPE_1 = "DATE";
+
+    private static final String ITEM_NAME_2 = "APPEARANCE";
+    private static final String ITEM_DESCRIPTION_LABEL_2 = "Appearance";
+    private static final String ITEM_LEFT_ITEM_TEXT_2 = "Appearance";
+    private static final String ITEM_HEADER_2 = "Body System / Site";
+    private static final String ITEM_SUBHEADER_2 = "If 'Abnormal' is selected, comments are required.";
+    private static final Integer ITEM_COLUMN_NUMBER_2 = 1;
+    private static final String ITEM_QUESTION_NUMBER_2 = "9";
+    private static final String ITEM_RESPONSE_TYPE_2 = "single-select";
+    private static final String ITEM_RESPONSE_OPTIONS_TEXT_2 = "Normal,Abnormal,Not Examined";
+    private static final String ITEM_RESPONSE_VALUES_OR_CALCULATIONS_2 = "1,2,99";
+    private static final String ITEM_DEFAULT_VALUE_2 = "(select one)";
+    private static final String ITEM_DATA_TYPE_2 = "INT";
+    private static final Integer ITEM_REQUIRED_2 = 1;
+
+    private static final String ITEM_NAME_3 = "APPEARANCE_COMMENTS";
+    private static final String ITEM_DESCRIPTION_LABEL_3 = "Appearance Comments";
+    private static final String ITEM_LEFT_ITEM_TEXT_3 = "Comments:(Required if Abnormal)";
+    private static final Integer ITEM_COLUMN_NUMBER_3 = 2;
+    private static final String ITEM_RESPONSE_TYPE_3 = "text";
+    private static final String ITEM_DATA_TYPE_3 = "ST";
+    private static final String ITEM_DISPLAY_STATUS_3 = "HIDE";
+    private static final String ITEM_SIMPLE_CONDITIONAL_DISPLAY_3 = "APPEARANCE,2,If a comment has been entered\\\\, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.";
+
+    private static final String INSTRUCTIONS_SHEET = "Instructions"
+
+    private static final String INSTRUCTIONS_INFO = "Generated by CRF Builder (https://github.com/MetadataRegistry/crf-builder)";
+    private static final String INSTRUCTIONS_VERSION = "Version: 3.1.3";
+    private static final int INSTRUCTIONS_INFO_ROW = 0;
+    private static final int INSTRUCTIONS_INFO_COL = 0;
+    private static final int INSTRUCTIONS_VERSION_ROW = 1;
+    private static final int INSTRUCTIONS_VERSION_COL = 0;
+
 
     CaseReportForm buildTestForm() {
         CaseReportForm.build(CRF_NAME) {
@@ -500,6 +758,29 @@ class CaseReportFormSerializerSpec extends Specification {
 
             section(SECTION_LABEL_2) {
                 title SECTION_TITLE_2
+                row {
+                    singleSelect(ITEM_NAME_2) {
+                        description ITEM_DESCRIPTION_LABEL_2
+                        question ITEM_LEFT_ITEM_TEXT_2
+                        header ITEM_HEADER_2
+                        subheader ITEM_SUBHEADER_2
+                        questionNumber ITEM_QUESTION_NUMBER_2
+                        options 'Normal': 1, 'Abnormal': 2, 'Not Examined': 99
+                        value ITEM_DEFAULT_VALUE_2
+                        dataType integer
+                        required true
+                    }
+                    text(ITEM_NAME_3) {
+                        dataType string
+                        description ITEM_DESCRIPTION_LABEL_3
+                        question ITEM_LEFT_ITEM_TEXT_3
+                        hide true
+                        show {
+                            when ITEM_NAME_2 is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+                        }
+
+                    }
+                }
             }
 
             section(SECTION_LABEL_3) {
@@ -513,6 +794,14 @@ class CaseReportFormSerializerSpec extends Specification {
             }
         }
 
+    }
+
+    private static HSSFWorkbook serialize(CaseReportForm form) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream()
+        new CaseReportFormSerializer(form).write(output)
+
+        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray())
+        new HSSFWorkbook(input)
     }
 
 }

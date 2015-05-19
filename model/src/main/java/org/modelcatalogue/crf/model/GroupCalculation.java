@@ -1,4 +1,4 @@
 package org.modelcatalogue.crf.model;
 
-public interface GroupCalculation extends Calculation {
+public interface GroupCalculation extends HasCalculation {
 }

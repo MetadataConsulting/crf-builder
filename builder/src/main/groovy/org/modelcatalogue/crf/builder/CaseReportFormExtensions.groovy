@@ -13,6 +13,7 @@ import org.modelcatalogue.crf.model.GenericItem
 import org.modelcatalogue.crf.model.GridGroup
 import org.modelcatalogue.crf.model.Group
 import org.modelcatalogue.crf.model.GroupCalculation
+import org.modelcatalogue.crf.model.HasCalculation
 import org.modelcatalogue.crf.model.HasDefaultValue
 import org.modelcatalogue.crf.model.HasDisplayStatus
 import org.modelcatalogue.crf.model.HasPageNumber
@@ -138,6 +139,7 @@ class CaseReportFormExtensions {
             throw new IllegalArgumentException("Item '$delegate.item' does not provides any option with value '$delegate.value'!")
         }
 
+        item.displayStatus = DisplayStatus.HIDE
         item.conditionalDisplay = new ConditionalDisplay(option, delegate.stale)
     }
 
@@ -285,8 +287,8 @@ class CaseReportFormExtensions {
         item.subheader = normalize subheader
     }
 
-    static void questionNumber(MinimalItem item, String questionNumber) {
-        item.questionNumber = normalize questionNumber
+    static void questionNumber(MinimalItem item, Object questionNumber) {
+        item.questionNumber = normalize questionNumber?.toString()
     }
 
     static void phi(MinimalItem item, boolean phi) {
@@ -343,6 +345,10 @@ class CaseReportFormExtensions {
         } else {
             throw new IllegalArgumentException("Cannot infer data type from $dataType")
         }
+    }
+
+    static void formula(HasCalculation item, String formula) {
+        item.calculation = "func: ($formula)"
     }
 
     private static String normalize(String string) {

@@ -1,5 +1,7 @@
 package org.modelcatalogue.crf.builder
 
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.DisplayStatus
@@ -54,8 +56,13 @@ class CaseReportFormExtensionsSpec extends Specification {
     public static final String CHECKBOX_VALUE = "checked"
     public static final String CHECKBOX_WIDTH_DECIMAL = "10(3)"
     public static final String TEXTAREA_DISPLAYED_BUT_SHOULD_BE_HIDDEN = "You have entered the value but this field should no longer be visible!"
+    public static final String CALCULATION_NAME = "CALCULATION"
+    public static final String CALCULATION_FORMULA = "radio_name/2"
+    public static final String CALCULATION_CALCULATION = "func: (radio_name/2)"
 
 
+
+    @Rule TemporaryFolder temporaryFolder = new TemporaryFolder()
 
 
     def "create new form"() {
@@ -108,6 +115,10 @@ class CaseReportFormExtensionsSpec extends Specification {
                                 when RADIO_NAME is 2 otherwise TEXTAREA_DISPLAYED_BUT_SHOULD_BE_HIDDEN
                             }
                         }
+                    }
+
+                    calculation (CALCULATION_NAME){
+                        formula CALCULATION_FORMULA
                     }
                 }
 
@@ -208,6 +219,13 @@ class CaseReportFormExtensionsSpec extends Specification {
         radio.responseValuesOrCalculations == '1,2'
 
         when:
+        Item calculation = group.items[CALCULATION_NAME]
+
+        then:
+        calculation
+        calculation.responseValuesOrCalculations == CALCULATION_CALCULATION
+
+        when:
         Group grid = section.groups[GRID_LABEL]
 
         then:
@@ -245,6 +263,28 @@ class CaseReportFormExtensionsSpec extends Specification {
         BigDecimal  | DataType.REAL
         Date        | DataType.DATE
         SqlDate     | DataType.DATE
+
+    }
+
+
+    def "load dsl file"() {
+        File file = temporaryFolder.newFile('test.crf')
+
+        //language=Groovy
+        file << '''
+            name 'Test Form'
+            version '1.1'
+            section('Test Section') {
+                title 'Test Section Description'
+            }
+        '''
+
+        CaseReportForm form = CaseReportForm.load(file)
+
+        expect:
+        form.name == 'Test Form'
+        form.version == '1.1'
+        form.sections.size() == 1
 
     }
 

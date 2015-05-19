@@ -1,0 +1,3 @@
+contributor (context(filetypes: ['crf'], scope: scriptScope())) {
+    delegatesTo(findClass('org.modelcatalogue.crf.builder.util.CaseReportFormScript'))
+}
