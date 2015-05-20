@@ -62,98 +62,99 @@ The idea of builder is to follow the logical nesting of the forms and ignore the
 
 [source,groovy]
 ----
-CaseReportForm form = CaseReportForm.build('Sample Physical Exam') {    // <1>
-version 'English'                                                       // <2>
-versionDescription 'Sample Physical Exam'                               // <3>
-revisionNotes 'htaycher 09-19-2012'                                     // <4>
+CaseReportForm form = CaseReportForm.build('Sample Physical Exam') {        // <1>
+    version 'English'                                                       // <2>
+    versionDescription 'Sample Physical Exam'                               // <3>
+    revisionNotes 'htaycher 09-19-2012'                                     // <4>
 
-section('I Basic') {                                                    // <5>
-    title 'Basic Information'                                           // <6>
-    row {                                                               // <7>
-        text('PEDAT') {                                                 // <8>
-            header 'Visit Information:'                                 // <9>
-            description 'Date of Physical Exam'                         // <10>
-            question 'Date of Physical Examination:'                    // <11>
-            questionNumber 1                                            // <12>
-            dataType date                                               // <13>
+    section('I Basic') {                                                    // <5>
+        title 'Basic Information'                                           // <6>
+        row {                                                               // <7>
+            text('PEDAT') {                                                 // <8>
+                header 'Visit Information:'                                 // <9>
+                description 'Date of Physical Exam'                         // <10>
+                question 'Date of Physical Examination:'                    // <11>
+                questionNumber 1                                            // <12>
+                dataType date                                               // <13>
+            }
+            text('PETIM') {
+                description 'Time of Physical Exam'
+                question 'Time of Physical Examination:'
+                units 'HH:MM'
+                questionNumber 2
+                dataType string
+                regexp(/([01][0-9]|2[0-3]):[0-5][0-9]/,
+                    'Please enter the time in the 24 hour format (HH:MM)')  // <14>
+            }
         }
-        text('PETIM') {
-            description 'Time of Physical Exam'
-            question 'Time of Physical Examination:'
-            units 'HH:MM'
-            questionNumber 2
-            dataType string
-            regexp(/([01][0-9]|2[0-3]):[0-5][0-9]/,
-                'Please enter the time in the 24 hour format (HH:MM)')  // <14>
+
+        text('TEMPERATURE') {
+            description 'Temperature'
+            question 'Temperature:'
+            units 'F'                                                       // <15>
+            questionNumber 5
+            dataType real
+            validate('Temperature out of expected range of 95-110 F.') {    // <16>
+                range(95,110)                                               // <17>
+            }
         }
+
+        // ...
     }
 
-    text('TEMPERATURE') {
-        description 'Temperature'
-        question 'Temperature:'
-        units 'F'                                                       // <15>
-        questionNumber 5
-        dataType real
-        validate('Temperature out of expected range of 95-110 F.') {    // <16>
-            range(95,110)                                               // <17>
+    section('II Body System') {
+        title 'Body System/Site'
+
+        calculation('BMI') {                                                // <18>
+            description 'Body Mass Index'
+            question 'Body Mass Index:'
+            dataType real
+            formula '(WEIGHT/pow(HEIGHT,2))*703'                            // <19>
         }
-    }
 
-    // ...
-}
-
-section('II Body System') {
-    title 'Body System/Site'
-
-    calculation('BMI') {                                                // <18>
-        description 'Body Mass Index'
-        question 'Body Mass Index:'
-        dataType real
-        formula '(WEIGHT/pow(HEIGHT,2))*703'                            // <19>
-    }
-
-    row {
-        singleSelect('APPEARANCE') {                                    // <20>
-            description 'Appearance'
-            question 'Appearance'
-            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99       // <21>
-            value '(select one)'                                        // <22>
-            dataType integer
-            required true                                               // <23>
-            questionNumber 9
-        }
-        text('APPEARANCE_COMMENTS') {
-            description 'Appearance Comments'
-            question 'Comments:(Required if Abnormal)'
-            dataType string
-            show {                                                      // <24>
-                when 'APPEARANCE' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+        row {
+            singleSelect('APPEARANCE') {                                    // <20>
+                description 'Appearance'
+                question 'Appearance'
+                options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99       // <21>
+                value '(select one)'                                        // <22>
+                dataType integer
+                required true                                               // <23>
+                questionNumber 9
+            }
+            text('APPEARANCE_COMMENTS') {
+                description 'Appearance Comments'
+                question 'Comments:(Required if Abnormal)'
+                dataType string
+                show {                                                      // <24>
+                    when 'APPEARANCE' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+                }
             }
         }
     }
-}
 
-section('III Other') {
-    title 'Specify Other Body System/Site'
+    section('III Other') {
+        title 'Specify Other Body System/Site'
 
-    grid ('Other Body System Site') {                                   // <25>
-        header 'Other Body System / Site'                               // <26>
-        text('OTHERBODYSYSTEM') {
-            description 'Other Body System/Site Description'
-            question 'Other Body System/Site:'
-            dataType string
-        }
-        singleSelect('OTHERBODYSYSTEM_STATUS') {
-            description 'Other Body System/Site Status'
-            question 'Status:'
-            options Normal: 1, Abnormal: 2
-            value '(select one)'
-            dataType integer
-        }
-        text('OTHERBODYSYSTEM_COMMENTS') {
-            description 'Other Body System/Site Comments'
-            question 'Comments:(Required if Abnormal)'
-            dataType string
+        grid ('Other Body System Site') {                                   // <25>
+            header 'Other Body System / Site'                               // <26>
+            text('OTHERBODYSYSTEM') {
+                description 'Other Body System/Site Description'
+                question 'Other Body System/Site:'
+                dataType string
+            }
+            singleSelect('OTHERBODYSYSTEM_STATUS') {
+                description 'Other Body System/Site Status'
+                question 'Status:'
+                options Normal: 1, Abnormal: 2
+                value '(select one)'
+                dataType integer
+            }
+            text('OTHERBODYSYSTEM_COMMENTS') {
+                description 'Other Body System/Site Comments'
+                question 'Comments:(Required if Abnormal)'
+                dataType string
+            }
         }
     }
 }
