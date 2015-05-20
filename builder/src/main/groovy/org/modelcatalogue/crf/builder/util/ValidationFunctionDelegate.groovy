@@ -1,5 +1,9 @@
 package org.modelcatalogue.crf.builder.util
 
+/**
+ * Simple class which lists the possible functions available in validation definition.
+ * @see org.modelcatalogue.crf.builder.CaseReportFormExtensions#validate(org.modelcatalogue.crf.model.GenericItem, java.lang.String, groovy.lang.Closure)
+ */
 class ValidationFunctionDelegate {
 
     static String gt(double d) { "func: gt($d)"}

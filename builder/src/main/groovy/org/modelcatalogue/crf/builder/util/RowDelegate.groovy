@@ -13,6 +13,12 @@ import org.modelcatalogue.crf.model.SingleSelect
 import org.modelcatalogue.crf.model.Text
 import org.modelcatalogue.crf.model.Textarea
 
+/**
+ * Delegate class for placing items next to each other.
+ *
+ * @see org.modelcatalogue.crf.model.Item#columnNumber
+ * @see org.modelcatalogue.crf.builder.CaseReportFormExtensions#row(org.modelcatalogue.crf.model.ItemContainer, groovy.lang.Closure)
+ */
 class RowDelegate implements ItemContainer {
 
     private int columnNumber = 1

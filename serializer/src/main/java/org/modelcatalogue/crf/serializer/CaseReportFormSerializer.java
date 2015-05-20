@@ -2,12 +2,14 @@ package org.modelcatalogue.crf.serializer;
 
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
 import org.modelcatalogue.crf.model.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * This class exports in memory form model to excel file.
+ */
 public class CaseReportFormSerializer {
 
 
@@ -118,11 +120,19 @@ public class CaseReportFormSerializer {
 
     private final CaseReportForm form;
 
+    /**
+     * Creates new serializer for given form.
+     * @param form form to be serialized
+     */
     public CaseReportFormSerializer(CaseReportForm form) {
         this.form = form;
     }
 
-    void write(OutputStream outputStream) throws IOException {
+    /**
+     * Writes the form as excel file to the output stream, usually the FileOutputStream.
+     * @param outputStream output stream to write the form to
+     */
+    public void write(OutputStream outputStream) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         HSSFSheet crfSheet = workbook.createSheet(SHEET_CRF);

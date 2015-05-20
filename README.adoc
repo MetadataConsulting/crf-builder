@@ -1,2 +1,185 @@
-# crf-builder
-OpenClinica Case Report Forms Builder
+# OpenClinica Case Report Forms Builder
+
+## Model
+
+The model represent the structure of the Case Report Form (CRF) focused on preventing the common errors when creating
+the CRF manually. It supports link:https://docs.oracle.com/javaee/6/tutorial/doc/gircz.html[Bean Validation] but can
+be used with link:http://docs.spring.io/spring/docs/current/spring-framework-reference/html/validation.html[Spring Validation]
+as well using the link:http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation/beanvalidation/SpringValidatorAdapter.html[SpringValidatorAdapter].
+
+You can use following snippet of code to validate the form in Java EE environment:
+[source,java]
+----
+Validator validator = Validation.buildDefaultValidatorFactory().getValidator();     // <1>
+Set<ConstraintViolation<CaseReportForm>> violations =  validator.validate(form);    // <2>
+----
+<1> Get the default bean validator
+<2> Get the form violations
+
+You can use following snippet of code to validate the form in Spring environment to get the `Errors` object:
+[source,java]
+----
+Validator validator = Validation.buildDefaultValidatorFactory().getValidator();     // <1>
+SpringValidatorAdapter validatorAdapter = new SpringValidatorAdapter(validator);    // <2>
+
+DataBinder binder = new DataBinder(form);                                           // <3>
+binder.addValidators(validatorAdapter);                                             // <4>
+binder.validate();                                                                  // <5>
+Errors errors = binder.getBindingResult();                                          // <6>
+----
+<1> Get the default bean validator
+<2> Wrap the bean validator to Spring adapter
+<3> Create new data binder
+<4> Add the validation adapter to the binder
+<5> Validate the form
+<6> Get the errors
+
+## Serializer
+
+Form serializer exports the model created manually or using builder to Excel file which can be imported to OpenClinica.
+[source,java]
+----
+File destination = new File("form.xls");                                        // <1>
+FileOutputStream fos = new FileOutputStream(destination);                       // <2>
+CaseReportFormSerializer serializer = new CaseReportFormSerializer(form);       // <3>
+serializer.write(fos);                                                          // <4>
+----
+<1> File to be written
+<2> Create new FileOutputStream for given file
+<3> Create new CaseReportFormSerializer for given form
+<4> Write form to the file
+
+
+## Builder
+Builder provides Groovy DSL on top of the model for easier easier form creation. Builder add two more static method
+to `CaseReportForm`:
+
+ . `build(formName){...}` - builds the new form using the DSL
+ . `load(dslFile)` - loads the form from DSL file (see link:https://github.com/MetadataRegistry/crf-builder/blob/master/serializer/src/test/resources/org/modelcatalogue/crf/serializer/samplePhysicalExamEnglish.crf[samplePhysicalExamEnglish.crf] as an example)
+
+
+The idea of builder is to follow the logical nesting of the forms and ignore the flat structure of the Excel files.
+
+[source,groovy]
+----
+CaseReportForm form = CaseReportForm.build('Sample Physical Exam') {                                        // <1>
+version 'English'                                                                                           // <2>
+versionDescription 'Sample Physical Exam'                                                                   // <3>
+revisionNotes 'htaycher 09-19-2012'                                                                         // <4>
+
+section('I Basic') {                                                                                        // <5>
+    title 'Basic Information'                                                                               // <6>
+    row {                                                                                                   // <7>
+        text('PEDAT') {                                                                                     // <8>
+            header 'Visit Information:'                                                                     // <9>
+            description 'Date of Physical Exam'                                                             // <10>
+            question 'Date of Physical Examination:'                                                        // <11>
+            questionNumber 1                                                                                // <12>
+            dataType date                                                                                   // <13>
+        }
+        text('PETIM') {
+            description 'Time of Physical Exam'
+            question 'Time of Physical Examination:'
+            units 'HH:MM'
+            questionNumber 2
+            dataType string
+            regexp(/([01][0-9]|2[0-3]):[0-5][0-9]/, 'Please enter the time in the 24 hour format (HH:MM)')  // <14>
+        }
+    }
+
+    text('TEMPERATURE') {
+        description 'Temperature'
+        question 'Temperature:'
+        units 'F'                                                                                           // <15>
+        questionNumber 5
+        dataType real
+        validate('Temperature out of expected range of 95-110 degrees F.') {                                // <16>
+            range(95,110)                                                                                   // <17>
+        }
+    }
+
+    // ...
+}
+
+section('II Body System') {
+    title 'Body System/Site'
+
+    calculation('BMI') {                                                                                     // <18>
+        description 'Body Mass Index'
+        question 'Body Mass Index:'
+        dataType real
+        formula '(WEIGHT/pow(HEIGHT,2))*703'                                                                 // <19>
+    }
+
+    row {
+        singleSelect('APPEARANCE') {                                                                         // <20>
+            description 'Appearance'
+            question 'Appearance'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99                                            // <21>
+            value '(select one)'                                                                             // <22>
+            dataType integer
+            required true                                                                                    // <23>
+            questionNumber 9
+        }
+        text('APPEARANCE_COMMENTS') {
+            description 'Appearance Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {                                                                                           // <24>
+                when 'APPEARANCE' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+}
+
+section('III Other') {
+    title 'Specify Other Body System/Site'
+
+    grid ('Other Body System Site') {                                                                        // <25>
+        header 'Other Body System / Site'                                                                    // <26>
+        text('OTHERBODYSYSTEM') {
+            description 'Other Body System/Site Description'
+            question 'Other Body System/Site:'
+            dataType string
+        }
+        singleSelect('OTHERBODYSYSTEM_STATUS') {
+            description 'Other Body System/Site Status'
+            question 'Status:'
+            options Normal: 1, Abnormal: 2
+            value '(select one)'
+            dataType integer
+        }
+        text('OTHERBODYSYSTEM_COMMENTS') {
+            description 'Other Body System/Site Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+        }
+    }
+}
+----
+<1> Build a new form using the builder DSL
+<2> Declare form's version
+<3> Declare form's version description
+<4> Declare form's revision notes
+<5> Create new section
+<6> Declare section's title
+<7> Create a row of items
+<8> Create new text item
+<9> Declare item's header
+<10> Declare item's description
+<11> Declare item's question (left text)
+<12> Declare item's question number
+<13> Declare item's data type
+<14> Set the regular expression for the item
+<15> Declare item's units
+<16> Set validation for the item
+<17> Validation is declared as method call with apropriate arguments
+<18> Create new calculation
+<19> Set formula for the calculation
+<20> Create new single select item
+<21> Declare item's options
+<22> Declare item's default value
+<23> Mark item as required
+<24> Configure simple conditional display
+<25> Create grid group
+<26> Declare header for the grid group

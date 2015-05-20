@@ -60,6 +60,9 @@ public class CaseReportForm {
     @Size(min = 1) private Map<String, Section> sections = new LinkedHashMap<String, Section>();
 
     public Section section(String label) {
+        if (sections.containsKey(label)) {
+            return sections.get(label);
+        }
         Section section = new Section();
         section.setLabel(label);
         addSection(section);

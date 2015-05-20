@@ -85,6 +85,9 @@ public class Section extends AbstractItemsContainer implements HasPageNumber {
      * @return new non-repeating group with given label.
      */
     public Group group(String label) {
+        if (groups.containsKey(label)) {
+            return groups.get(label);
+        }
         Group group = new Group();
         group.setLabel(label);
         addGroup(group);
@@ -97,6 +100,13 @@ public class Section extends AbstractItemsContainer implements HasPageNumber {
      * @return new repeating grid group with given label.
      */
     public GridGroup grid(String label) {
+        if (groups.containsKey(label)) {
+            Group group = groups.get(label);
+            if (group instanceof GridGroup) {
+            return (GridGroup) group;
+            }
+            throw new IllegalArgumentException("Group " + label + " already exists but it's not grid!");
+        }
         GridGroup group = new GridGroup();
         group.setLabel(label);
         addGroup(group);
