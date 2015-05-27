@@ -1,8 +1,8 @@
 dependencies {
-    compile project(':model')
+    compile project(':crf-builder-model')
     compile 'org.apache.poi:poi:3.11'
 
-    testCompile project(':builder')
+    testCompile project(':crf-builder-builder')
 
     testCompile 'org.springframework:spring-context:4.1.6.RELEASE'
     testCompile 'javax.el:javax.el-api:2.2.5'

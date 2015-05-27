@@ -17,7 +17,7 @@ public class GridGroup extends Group {
      * Used only when the GROUP_LAYOUT is equal to GRID.
      *
      * Only use when the layout is set to GRID.  This value is like a title for the group.  An example of a GROUP_HEADER
-     * would be “Medications Log.”
+     * would be "Medications Log."
      *
      * The field can be left blank if you do not want a title or header.  If the Layout is set to NON-REPEATING,
      * the value will be ignored and not displayed during data entry.

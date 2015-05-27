@@ -1,1 +1,1 @@
-include 'model', 'builder', 'serializer'
+include 'crf-builder-model', 'crf-builder-builder', 'crf-builder-serializer'

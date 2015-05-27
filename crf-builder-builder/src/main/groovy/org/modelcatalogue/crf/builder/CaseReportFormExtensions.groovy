@@ -318,7 +318,7 @@ class CaseReportFormExtensions {
      * The value is displayed above the GRID when a user is performing data entry.
      *
      * This value is like a title for the group.  An example of a GROUP_HEADER
-     * would be “Medications Log.”
+     * would be "Medications Log."
      *
      * The field can be left blank if you do not want a title or header.  If the Layout is set to NON-REPEATING,
      * the value will be ignored and not displayed during data entry.
@@ -559,7 +559,7 @@ class CaseReportFormExtensions {
      * The value of LEFT_ITEM_TEXT is displayed to the left of the form input.
      * The text wraps after the first 20 characters.
      *
-     * An example question would be “What is the subject’s height?”  Or, a simple one word “Height” suffices as well.
+     * An example question would be "What is the subject's height?"  Or, a simple one word "Height" suffices as well.
      *
      * If the item is part of a repeating group (GRID), the LEFT_ITEM_TEXT is displayed as a column header above
      * the field and not be displayed to the left of the item.
@@ -583,7 +583,7 @@ class CaseReportFormExtensions {
      * instructions. The value of RIGHT_ITEM_TEXT is displayed to the right of the form input. The text wraps after
      * the first 20 characters.
      *
-     * An example of use of right item text is “If other, please specify”.
+     * An example of use of right item text is "If other, please specify".
      *
      * If the item is part of a repeating group (GRID), the RIGHT_ITEM_TEXT will be ignored and never displayed.
      *
@@ -628,7 +628,7 @@ class CaseReportFormExtensions {
      * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
      *
      * This field can be used as a replacement for left and right item text or as a replacement for instructions.
-     * It allows a greater number of characters, along with bolding the text, to get the data entry person’s attention.
+     * It allows a greater number of characters, along with bolding the text, to get the data entry person's attention.
      *
      * @param item current item
      * @param header header text upto 2000 characters
@@ -650,7 +650,7 @@ class CaseReportFormExtensions {
      *
      * This field can be used as a replacement or augmentation for left and right item text or as a
      * replacement/augmentation for section/group instructions.  It allows a greater number of characters, along with
-     * providing a grey background to the text in order to get the data entry user’s attention.
+     * providing a grey background to the text in order to get the data entry user's attention.
      *
      * @param item current item
      * @param subheader subheader text upto 240 characters

@@ -39,7 +39,7 @@ public enum ResponseType {
     /**
      * Calculation is used to derive values. Calculations allow for the execution of arithmetic expressions and support
      * some basic functions. The calculations use values from previous fields within the same CRF as variables.
-     * The calculated field cannot be directly edited by the data entry person and will appear “grayed out”.
+     * The calculated field cannot be directly edited by the data entry person and will appear "grayed out".
      *
      *  The values of calculated fields are generated when the user saves the section of the form.
      *
@@ -50,7 +50,7 @@ public enum ResponseType {
     /**
      * Group-calculation is used to derive values. Group-calculation allow for the execution of arithmetic expressions
      * and support some basic functions. The calculations use values from previous fields within the same CRF as variables.
-     * The calculated field cannot be directly edited by the data entry person and will appear “grayed out”.
+     * The calculated field cannot be directly edited by the data entry person and will appear "grayed out".
      * Group-calculation allows the user to find a value based off of the column in a grid (e.g. sum).
      *
      * The group-calculation should not be contained in a repeating group, rather the variable that is being used

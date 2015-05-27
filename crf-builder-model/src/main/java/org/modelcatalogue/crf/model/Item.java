@@ -61,7 +61,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * The field is not displayed as part of the CRF but can be viewed as part of the CRF and Item Metadata, and is shown
      * in the Discrepancy Notes and Rules modules.
      *
-     * This field is case-sensitive. Items with names “item1” and “Item1” will be treated as different items. This can
+     * This field is case-sensitive. Items with names "item1" and "Item1" will be treated as different items. This can
      * cause issues with many data analysis tools and should be avoided in most cases.
      *
      * For Enterprise customers interested in using Datamart:
@@ -75,7 +75,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * Brevity is recommended for the value as it will be used to generate the unique OC_OID.
      *
      * Re-use of the same ITEM_NAME across CRF Versions indicates the variable is the same item. Once created, an item
-     * name cannot be modified within the CRF. See “CRF Versioning” and “Scope of CRFs and Items” in this document
+     * name cannot be modified within the CRF. See "CRF Versioning" and "Scope of CRFs and Items" in this document
      * for more detail.
      */
     @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_ENGLISH_NO_SPACES_PATTERN) private String name;
@@ -107,7 +107,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * The value of LEFT_ITEM_TEXT is displayed to the left of the form input. 
      * The text wraps after the first 20 characters.
      * 
-     * An example question would be “What is the subject’s height?”  Or, a simple one word “Height” suffices as well.
+     * An example question would be "What is the subject's height?"  Or, a simple one word "Height" suffices as well.
      * 
      * If the item is part of a repeating group (GRID), the LEFT_ITEM_TEXT is displayed as a column header above 
      * the field and not be displayed to the left of the item.
@@ -142,7 +142,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * instructions. The value of RIGHT_ITEM_TEXT is displayed to the right of the form input. The text wraps after
      * the first 20 characters.
      *
-     * An example of use of right item text is “If other, please specify”.
+     * An example of use of right item text is "If other, please specify".
      *
      * If the item is part of a repeating group (GRID), the RIGHT_ITEM_TEXT will be ignored and never displayed.
      *
@@ -181,8 +181,8 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * (i.e. UNGROUPED items could later be grouped). While  OpenClinica allowed this functionality, ODM does not
      * support this type of structure change between different CRF versions. As a result, these types of structural
      * changes could break extracts which contain the effected CRF. A new column has been introduced to View CRF page
-     * to allow a user to verify CRF integrity. The new table, called ‘Items’ gives a list of items in a CRF where
-     * the last two columns (‘Version(s)’ and ‘Integrity Check’) provide information about which version(s) the item
+     * to allow a user to verify CRF integrity. The new table, called 'Items' gives a list of items in a CRF where
+     * the last two columns ('Version(s)' and 'Integrity Check') provide information about which version(s) the item
      * belongs to and if the item passes the integrity check (verifying that the item has not been assigned to more than
      * one item group).
      *
@@ -201,7 +201,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * link &lt;a href=""&gt;, image &lt;img src=""&gt;).
      *
      * This field can be used as a replacement for left and right item text or as a replacement for instructions.
-     * It allows a greater number of characters, along with bolding the text, to get the data entry person’s attention.
+     * It allows a greater number of characters, along with bolding the text, to get the data entry person's attention.
      */
     @Size(max = 2000) private String header;
 
@@ -216,7 +216,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      *
      * This field can be used as a replacement or augmentation for left and right item text or as a
      * replacement/augmentation for section/group instructions.  It allows a greater number of characters, along with
-     * providing a grey background to the text in order to get the data entry user’s attention.
+     * providing a grey background to the text in order to get the data entry user's attention.
      */
     @Size(max = 240) private String subheader;
 
@@ -300,7 +300,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * calculations on the entire set of repeating items are allowed. The allowed functions are sum(), avg(), min(),
      * max(), median(), and stdev().
      * For example, in an invoice with a repeating group of line items, the calculation for a total price would be
-     * the group-calculation “func: (sum (LINE_ITEM_PRICE))”.
+     * the group-calculation "func: (sum (LINE_ITEM_PRICE))".
      *
      * Instant calculation fields should use this field to define the onchange() function with arguments of an item name
      * (the trigger item) and value.
@@ -358,16 +358,16 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * Specify the width (the length of the field) and the number of decimal places to use for the field.
      * If provided must be in the form w(d) as follows:
      *
-     * w – integer from 1 to 26, or literal ‘w’ if INT or REAL.  If ST, from 1 to 4000 is allowed.
+     * w - integer from 1 to 26, or literal 'w' if INT or REAL.  If ST, from 1 to 4000 is allowed.
      *
-     * d – literal ‘d’. if the item has DATA_TYPE of ‘REAL’, may also be an integer from 1 to 20. d cannot be larger than w
+     * d - literal 'd'. if the item has DATA_TYPE of 'REAL', may also be an integer from 1 to 20. d cannot be larger than w
      *
      *
      * Defines the width (the maximum allowed length of the field) and the number of decimal places to use for the field
      * in the form w(d).
      *
      * The first input defines the width of the field. The second input specifies the number of decimal places for
-     * the field, if the item has a DATA_TYPE of ‘REAL’.
+     * the field, if the item has a DATA_TYPE of 'REAL'.
      *
      * The WIDTH_DECIMAL attribute should only be used for items with the ST, INT or REAL data types. The width
      * attribute specifies the length of the field treated as a string, so even if the item is of type INT or REAL,
@@ -378,17 +378,17 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * the width limit.
      *
      * Examples.:
-     * DATA_TYPE ‘REAL’, WIDTH_DECIMAL 5(1) – Allows a maximum of 5 characters with only 1 decimal place. OpenClinica
+     * DATA_TYPE 'REAL', WIDTH_DECIMAL 5(1) - Allows a maximum of 5 characters with only 1 decimal place. OpenClinica
      * will accept 12345 and 1234., 123.4, or 12.30  but will not accept 012345 or 123456.
      *
      * Inputs such as 12.345 or 1234.5678 or 012345 or 12.300 will be allowed and rounded.
      *
-     * REAL w(4) –Allows up to OpenClinica’s maximum length for an item of ST, INT, or REAL (26 characters), with
+     * REAL w(4) -Allows up to OpenClinica's maximum length for an item of ST, INT, or REAL (26 characters), with
      * any decimal in excess of 1/10000th rounded to the 4th decimal place.
      *
-     * REAL 20(d) –Allows a maximum length of 20 and decimal length of 4 (the default in OpenClinica).
+     * REAL 20(d) -Allows a maximum length of 20 and decimal length of 4 (the default in OpenClinica).
      *
-     * ST 20(d) or INT 20(d) – Allows a maximum length of 20 characters.
+     * ST 20(d) or INT 20(d) - Allows a maximum length of 20 characters.
      *
      * If the DATA_TYPE of the item is DATE, PDATE, or FILE, the WIDTH_DECIMAL attribute should be left blank.
      *
@@ -507,10 +507,10 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * The user can delete pregnancy answers and in that case the UI items will get hidden.
      *
      * Note that the database gets updated only on SAVE. In the above example the system will allow saving
-     * “inconsistent” data (SEX = Male, but pregnancy items filled), but it is up to a user to create discrepancy
+     * "inconsistent" data (SEX = Male, but pregnancy items filled), but it is up to a user to create discrepancy
      * fields for them explaining the situation.
      *
-     * Note that radio button controls cannot be deselected, meaning there is no way to delete it’s value once it has
+     * Note that radio button controls cannot be deselected, meaning there is no way to delete it's value once it has
      * been selected.
      *
      */
