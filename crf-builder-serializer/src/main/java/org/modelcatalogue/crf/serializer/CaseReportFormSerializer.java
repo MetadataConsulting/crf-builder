@@ -320,7 +320,7 @@ public class CaseReportFormSerializer {
     private static void makeHeaderRows(HSSFRow... rows) {
         for (HSSFRow row : rows) {
             HSSFFont boldFont = row.getSheet().getWorkbook().createFont();
-            boldFont.setBold(true);
+            boldFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
             boldFont.setFontName(HSSFFont.FONT_ARIAL);
             boldFont.setFontHeightInPoints((short)10);
 
