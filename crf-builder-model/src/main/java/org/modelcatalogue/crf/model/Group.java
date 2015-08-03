@@ -40,7 +40,10 @@ public class Group extends AbstractItemsContainer implements HasDisplayStatus {
      * (this applies to GRID and NON-REPEATING). The opposite is true as well.  Groups that are set to HIDE which have
      * been shown as a result of a rule can also be hidden based on certain criteria being met.
      *
-     * Note that the GROUP is the container for items and that items within the group can have nested SHOW/HIDE logic as well. If a hidden group is shown but some of the items within that group have been set to HIDE within the ITEMS worksheet, additional logic will have to be built for those individual items. If all items within the group are set to SHOW within the items worksheet, then showing the time group will show all items.
+     * Note that the GROUP is the container for items and that items within the group can have nested SHOW/HIDE logic as
+     * well. If a hidden group is shown but some of the items within that group have been set to HIDE within the ITEMS
+     * worksheet, additional logic will have to be built for those individual items. If all items within the group are
+     * set to SHOW within the items worksheet, then showing the time group will show all items.
      */
     @NotNull private DisplayStatus displayStatus;
 

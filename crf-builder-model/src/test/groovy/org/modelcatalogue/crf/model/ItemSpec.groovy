@@ -43,6 +43,19 @@ class ItemSpec extends Specification {
         item.responseValuesOrCalculations == 'm,f'
     }
 
+    def "store response option with empty stirng as a value"() {
+        Item item = new Item(ResponseType.SINGLE_SELECT)
+        item.responseOptions = [
+                new ResponseOption('Please, select', ''),
+                new ResponseOption('Male', 'm'),
+                new ResponseOption('Female', 'f')
+        ]
+
+        expect:
+        item.responseOptionsText == 'Please\\\\, select,Male,Female'
+        item.responseValuesOrCalculations == ',m,f'
+    }
+
     def "test supported value failed"() {
         Errors errors = ValidationHelper.validate(Item, defaultValue: "Foo", responseType: ResponseType.FILE)
 

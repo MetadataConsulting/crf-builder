@@ -667,7 +667,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
         }
 
         if (this.responseLabel == null && this.name != null) {
-            this.responseLabel = this.name + RESPONSE_LABEL_SUFFIX;
+            setResponseLabel(this.name + RESPONSE_LABEL_SUFFIX);
         }
         this.responseOptionsText = storeResponseOptions(texts);
         this.responseValuesOrCalculations = storeResponseOptions(values);
@@ -806,7 +806,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
             throw new IllegalStateException("Cannot set calculation for non-calculation response types.");
         }
         if (this.responseLabel == null && this.name != null) {
-            this.responseLabel = this.name + RESPONSE_LABEL_SUFFIX;
+            setResponseLabel(this.name + RESPONSE_LABEL_SUFFIX);
         }
         this.responseOptionsText = CALCULATION_RESPONSE_OPTIONS_TEXT;
         this.responseValuesOrCalculations = calculation;
