@@ -59,6 +59,7 @@ class CaseReportFormExtensionsSpec extends Specification {
     public static final String CALCULATION_NAME = "CALCULATION"
     public static final String CALCULATION_FORMULA = "radio_name/2"
     public static final String CALCULATION_CALCULATION = "func: (radio_name/2)"
+    public static final String IN_GROUP_TEXT_NAME = "in_group_text"
 
 
 
@@ -126,6 +127,8 @@ class CaseReportFormExtensionsSpec extends Specification {
                     header GRID_HEADER
                     rows GRID_REPEAT_NUM
                     upto GRID_REPEAT_MAX
+
+                    text(IN_GROUP_TEXT_NAME)
                 }
 
             }
@@ -235,8 +238,9 @@ class CaseReportFormExtensionsSpec extends Specification {
         grid.header == GRID_HEADER
         grid.repeatNum == GRID_REPEAT_NUM
         grid.repeatMax == GRID_REPEAT_MAX
-
-
+        grid.items.size() == 1
+        grid.items[IN_GROUP_TEXT_NAME]
+        grid.items[IN_GROUP_TEXT_NAME].group == grid
     }
 
 
