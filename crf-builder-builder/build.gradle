@@ -1,4 +1,4 @@
 dependencies {
     compile project(':crf-builder-model')
-    compile 'org.codehaus.groovy:groovy-all:2.4.3'
+    compile 'org.codehaus.groovy:groovy-all:2.4.6'
 }
