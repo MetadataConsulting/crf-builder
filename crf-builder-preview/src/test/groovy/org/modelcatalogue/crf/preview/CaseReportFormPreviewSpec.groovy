@@ -1,5 +1,7 @@
 package org.modelcatalogue.crf.preview
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.modelcatalogue.crf.model.CaseReportForm
 import spock.lang.Specification
 
@@ -17,8 +19,17 @@ class CaseReportFormPreviewSpec extends Specification {
         new CaseReportFormPreview(form).write(out)
         String html = out.toString()
 
+        new File(System.getProperty('java.io.tmpdir'), 'crf-builder-preview.html').text = html
+
         then:
         html
+
+        when:
+        Document document = Jsoup.parse(html)
+
+        then:
+        document
+
     }
 
 }

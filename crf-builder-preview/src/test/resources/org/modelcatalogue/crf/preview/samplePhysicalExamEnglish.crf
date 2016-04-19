@@ -5,6 +5,8 @@ revisionNotes 'htaycher 09-19-2012'
 
 section('I Basic') {
     title 'Basic Information'
+    subtitle '<em>Just Regular Stuff</em>'
+    instructions 'These are boring instructions <strong>no-one</strong> reads.'
     row {
         text('PEDAT') {
             header 'Visit Information:'
@@ -105,6 +107,7 @@ section('I Basic') {
 
 section('II Body System') {
     title 'Body System/Site'
+    pageNumber "10"
 
     calculation('BMI') {
         description 'Body Mass Index'
@@ -114,14 +117,14 @@ section('II Body System') {
     }
 
     row {
-        singleSelect('APPEARANCE') {
+        multiSelect('APPEARANCE') {
             header 'Body System / Site'
             subheader 'If \'Abnormal\' is selected, comments are required.'
 
             description 'Appearance'
             question 'Appearance'
             options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
-            value '(select one)'
+            value '2'
             dataType integer
             required true
             questionNumber 9

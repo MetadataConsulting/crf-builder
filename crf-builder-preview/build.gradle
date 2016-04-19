@@ -10,5 +10,6 @@ dependencies {
 
     // test data
     testCompile project(':crf-builder-builder')
+    testCompile 'org.jsoup:jsoup:1.9.1'
 
 }
