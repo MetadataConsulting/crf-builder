@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 @ValidRepeat
 public class GridGroup extends Group {
 
-    public GridGroup() {}
+    GridGroup() {}
 
     /**
      * The value is displayed above the GRID when a user is performing data entry.

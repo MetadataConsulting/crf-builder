@@ -489,6 +489,7 @@ section('III Other') {
 
     grid ('Other Body System Site') {
         header 'Other Body System / Site'
+        rows 3
         text('OTHERBODYSYSTEM') {
             description 'Other Body System/Site Description'
             question 'Other Body System/Site:'
@@ -500,6 +501,7 @@ section('III Other') {
             options Normal: 1, Abnormal: 2
             value '(select one)'
             dataType integer
+            units 'A/N'
         }
         text('OTHERBODYSYSTEM_COMMENTS') {
             description 'Other Body System/Site Comments'

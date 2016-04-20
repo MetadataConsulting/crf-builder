@@ -14,10 +14,10 @@ import org.modelcatalogue.crf.model.Section
 class CaseReportFormPreview {
 
     private static final String UNTITLED_FORM_NAME = 'Untitled Case Report Form'
-    private final CaseReportForm form
+    private final CaseReportForm caseReportForm
 
     CaseReportFormPreview(CaseReportForm caseReportForm) {
-        this.form = caseReportForm
+        this.caseReportForm = caseReportForm
     }
 
     void write(OutputStream out) {
@@ -27,7 +27,7 @@ class CaseReportFormPreview {
             html(lang:'en') {
                 head {
                     meta('http-equiv':'"Content-Type" content="text/html; charset=utf-8"')
-                    title(form.name ?: UNTITLED_FORM_NAME)
+                    title(caseReportForm.name ?: UNTITLED_FORM_NAME)
                     link(rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css','')
                     link(rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css','')
 
@@ -37,6 +37,14 @@ class CaseReportFormPreview {
                             .popover, .popover-content {
                                 width: 400px;
                                 min-width: 700px;
+                            }
+                            .table-fixed {
+                                table-layout: fixed;
+                            }
+                            label {
+                                border-bottom-style: dashed;
+                                border-bottom-color: gray;
+                                border-bottom-width: 1px;
                             }
                         '''.stripIndent().trim()
                     }
@@ -55,35 +63,35 @@ class CaseReportFormPreview {
                 body {
                     div(class: 'container', style: 'margin-top: 50px;') {
                         div(class: 'jumbotron') {
-                            h1(form.name ?: UNTITLED_FORM_NAME)
+                            h1(caseReportForm.name ?: UNTITLED_FORM_NAME)
                             p {
                                 strong "Version: "
-                                mkp.yield form.version
+                                mkp.yield caseReportForm.version
                             }
                             p {
                                 strong "Version Description: "
-                                mkp.yield form.versionDescription
+                                mkp.yield caseReportForm.versionDescription
                             }
                             p {
                                 strong "Revision Notes: "
-                                mkp.yield form.revisionNotes
+                                mkp.yield caseReportForm.revisionNotes
                             }
                         }
                         ul(class: 'nav nav-tabs', role: 'tablist') {
-                            for (Section section in form.sections.values()) {
+                            for (Section section in caseReportForm.sections.values()) {
                                 Map<String, Object> args = [role: 'presentation']
-                                if (section == form.sections.values().first()) {
+                                if (section == caseReportForm.sections.values().first()) {
                                     args.class = 'active'
                                 }
                                 li(args) {
-                                    a(section.label, 'data-toggle': 'tab', role: 'tab', href: "#${section.label.replaceAll('\\W','_')}", 'aria-controlls': section.label.replaceAll('\\W','_'))
+                                    a(section.label, 'data-toggle': 'tab', role: 'tab', href: "#${getSectionIdFromLabel(section)}", 'aria-controlls': getSectionIdFromLabel(section))
                                 }
                             }
                         }
                         div(class: 'tab-content') {
-                            for (Section section in form.sections.values()) {
-                                Map<String, Object> args = [class: "row tab-pane", role: "tabpanel", id: section.label.replaceAll('\\W','_') ]
-                                if (section == form.sections.values().first()) {
+                            for (Section section in caseReportForm.sections.values()) {
+                                Map<String, Object> args = [class: "row tab-pane", role: "tabpanel", id: getSectionIdFromLabel(section)]
+                                if (section == caseReportForm.sections.values().first()) {
                                     args['class'] = "${args['class']} active"
                                 }
                                 div(args) {
@@ -110,7 +118,32 @@ class CaseReportFormPreview {
                                             }
                                         }
 
+                                        GridGroup grid = null
+
                                         for (Item item in section.items.values()) {
+                                            if (item.group && item.group == grid) {
+                                                continue
+                                            }
+
+                                            if (item.group instanceof GridGroup) {
+                                                grid = item.group as GridGroup
+                                                if (grid.header) {
+                                                    div(class: 'row') {
+                                                        div(class: 'col-md-12') {
+                                                            h3(title: "Grid Header") {
+                                                                mkp.yield grid.header
+                                                                mkp.yield " "
+                                                                if (grid.displayStatus == DisplayStatus.HIDE) {
+                                                                    span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
+                                                                    mkp.yield ' '
+                                                                }
+                                                                span(class: 'text-muted small pull-right', title: 'Label', grid.label)
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+
                                             if (item.header) {
                                                 div(class: 'row') {
                                                     div(class: 'col-md-12') {
@@ -127,54 +160,43 @@ class CaseReportFormPreview {
                                                     }
                                                 }
                                             }
+
+                                            if (grid) {
+                                                table (class: 'table table-fixed') {
+                                                    thead {
+                                                        tr {
+                                                            for (Item gridItem in grid.items.values()) {
+                                                                th(addDataItemPopover(gridItem, class: getCellClassForCount(grid.items.size()))) {
+                                                                    renderLabel(builder, gridItem)
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    tbody {
+                                                        (grid.repeatNum ?: 1).times {
+                                                            builder.tr {
+                                                                for (Item gridItem in grid.items.values()) {
+                                                                    td class: getCellClassForCount(grid.items.size()), {
+                                                                        renderInput(builder, gridItem)
+                                                                        renderUnits(builder, gridItem)
+                                                                    }
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+
+                                                continue
+                                            }
+
+
                                             div(class: 'row') {
                                                 div(class: 'col-md-12') {
-                                                    div(class: 'form-group', 'data-content': buildPopover(item), title: item.name, 'data-toggle': 'popover', 'data-trigger': 'hover', 'data-placement': 'top', 'data-html': 'true') {
-                                                        label(for: item.name) {
-                                                            if (item.questionNumber) {
-                                                                mkp.yield item.questionNumber
-                                                                mkp.yield ' '
-                                                            }
-                                                            if (item.leftItemText) {
-                                                                mkp.yield(item.leftItemText)
-                                                                mkp.yield ' '
-                                                            }
-                                                            if (item.required) {
-                                                                span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
-                                                                mkp.yield ' '
-                                                            }
-                                                            if (item.phi) {
-                                                                span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
-                                                                mkp.yield ' '
-                                                            }
-                                                            if (item.displayStatus == DisplayStatus.HIDE) {
-                                                                span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
-                                                                mkp.yield ' '
-                                                            }
-                                                            if (item.validation) {
-                                                                span(class: 'fa fa-fw fa-check-circle text-muted small', title: 'Validation', '')
-                                                                mkp.yield ' '
-                                                            }
-
-                                                            if (item.pageNumber) {
-                                                                span(class: 'fa fa-fw fa-file-text-o text-muted small', title: 'Page Number', '')
-                                                                mkp.yield ' '
-                                                            }
-
-                                                            if (item.widthDecimal) {
-                                                                span(class: 'fa fa-fw fa-hashtag text-muted small', title: 'Format', '')
-                                                                mkp.yield ' '
-                                                            }
-
-                                                            if (item.group && !(item.group instanceof GridGroup)) {
-                                                                span(class: 'fa fa-fw fa-object-group text-muted small', title: 'Group', '')
-                                                                mkp.yield ' '
-                                                            }
-                                                        }
-                                                        CaseReportFormPreview.renderInput(builder, item)
-                                                        if (item.units) {
-                                                            span("$item.units")
-                                                        }
+                                                    div(addDataItemPopover(class: 'form-group', item)) {
+                                                        renderLabel(builder, item)
+                                                        renderInput(builder, item)
+                                                        renderUnits(builder, item)
                                                         if (item.rightItemText) {
                                                             span(item.rightItemText)
                                                         }
@@ -192,6 +214,10 @@ class CaseReportFormPreview {
                 }
             }
         }
+    }
+
+    private static String getSectionIdFromLabel(Section section) {
+        section.label.replaceAll('\\W', '_')
     }
 
     private static void renderInput(builder, Item item) {
@@ -359,5 +385,78 @@ class CaseReportFormPreview {
 
         builder << '</div>'
         return builder.toString()
+    }
+
+    private static String getCellClassForCount(int count) {
+        switch (count) {
+            case [0,1]: return "col-md-12"
+            case 2: return "col-md-6"
+            case 3: return "col-md-4"
+            case [4,5]: return "col-md-3"
+            case 6..11: return "col-md-2"
+            default: return "col-md-1"
+        }
+    }
+
+    private static void renderLabel(builder, Item item) {
+        builder.label(for: item.name) {
+            if (item.questionNumber) {
+                mkp.yield item.questionNumber
+                mkp.yield ' '
+            }
+            if (item.leftItemText) {
+                mkp.yield(item.leftItemText)
+                mkp.yield ' '
+            }
+            if (item.required) {
+                span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
+                mkp.yield ' '
+            }
+            if (item.phi) {
+                span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
+                mkp.yield ' '
+            }
+            if (item.displayStatus == DisplayStatus.HIDE) {
+                span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
+                mkp.yield ' '
+            }
+            if (item.validation) {
+                span(class: 'fa fa-fw fa-check-circle text-muted small', title: 'Validation', '')
+                mkp.yield ' '
+            }
+
+            if (item.pageNumber) {
+                span(class: 'fa fa-fw fa-file-text-o text-muted small', title: 'Page Number', '')
+                mkp.yield ' '
+            }
+
+            if (item.widthDecimal) {
+                span(class: 'fa fa-fw fa-hashtag text-muted small', title: 'Format', '')
+                mkp.yield ' '
+            }
+
+            if (item.group && !(item.group instanceof GridGroup)) {
+                span(class: 'fa fa-fw fa-object-group text-muted small', title: 'Group', '')
+                mkp.yield ' '
+            }
+        }
+    }
+
+    private static void renderUnits(builder, Item item) {
+        if (item.units) {
+            builder.span("$item.units")
+        }
+    }
+
+    private static Map<String, Object> addDataItemPopover(Map<String, Object> args = [:], Item item) {
+        args.putAll 'data-content': buildPopover(item),
+                title: item.name,
+                'data-toggle': 'popover',
+                'data-trigger': 'hover',
+                'data-placement': 'top',
+                'data-html': 'true',
+                'data-container': 'body',
+                'data-viewport': "#${getSectionIdFromLabel(item.section)}"
+        return args
     }
 }
