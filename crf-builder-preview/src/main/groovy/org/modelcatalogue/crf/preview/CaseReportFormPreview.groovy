@@ -191,7 +191,20 @@ class CaseReportFormPreview {
     private static void renderInput(builder, Item item) {
         switch (item.responseType) {
             case ResponseType.TEXT:
-                builder.input type: 'text', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                switch (item.dataType) {
+                    case DataType.INT:
+                    case DataType.REAL:
+                        builder.input type: 'number', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                        break
+                    case DataType.DATE:
+                    case DataType.PDATE:
+                        builder.input type: 'date', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                        break
+                    case DataType.ST:
+                    default:
+                        builder.input type: 'text', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                        break
+                }
                 break;
             case ResponseType.TEXTAREA:
                 builder.textarea class: 'form-control', id: item.name, name: item.name, item.defaultValue ?: ''
