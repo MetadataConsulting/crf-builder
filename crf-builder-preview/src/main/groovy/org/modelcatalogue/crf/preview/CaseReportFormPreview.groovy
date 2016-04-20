@@ -149,6 +149,10 @@ class CaseReportFormPreview {
                                                                 span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
                                                                 mkp.yield ' '
                                                             }
+                                                            if (item.validation) {
+                                                                span(class: 'fa fa-fw fa-check-circle text-muted small', title: 'Validation', '')
+                                                                mkp.yield ' '
+                                                            }
                                                         }
                                                         CaseReportFormPreview.renderInput(builder, item)
                                                         if (item.units) {
@@ -280,13 +284,22 @@ class CaseReportFormPreview {
         if (item.displayStatus == DisplayStatus.HIDE) {
             builder << '<span class="fa fa-fw fa-eye-slash"></span> Hidden '
             if (item.simpleConditionalDisplay) {
-                builder << '(show when <code>' << item.conditionalDisplay.response.item.name << '</code> is '
+                builder << '(this item is shown when <code>' << item.conditionalDisplay.response.item.name << '</code> is '
                 builder << '<code>' << item.conditionalDisplay.response.text << '<span class="text-muted">['
                 builder << item.conditionalDisplay.response.value << ']</span>' << '</code> with instructions '
                 builder << '<span class="text-warning">"' << item.conditionalDisplay.message << '"<span>'
                 builder << ')'
             }
 
+            builder << '\n'
+
+        }
+
+        if (item.validation) {
+            builder << '<span class="fa fa-fw fa-check-circle"></span> Validation: <code>' << item.validation << '</code>'
+            if (item.validationErrorMessage) {
+                builder << ' (<span class="text-warning">' << item.validationErrorMessage << '</span>)'
+            }
             builder << '\n'
 
         }
