@@ -2,6 +2,7 @@ package org.modelcatalogue.crf.preview
 
 import groovy.xml.StreamingMarkupBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
+import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.DisplayStatus
 import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ResponseLayout
@@ -153,6 +154,16 @@ class CaseReportFormPreview {
                                                                 span(class: 'fa fa-fw fa-check-circle text-muted small', title: 'Validation', '')
                                                                 mkp.yield ' '
                                                             }
+
+                                                            if (item.pageNumber) {
+                                                                span(class: 'fa fa-fw fa-file-text-o text-muted small', title: 'Page Number', '')
+                                                                mkp.yield ' '
+                                                            }
+
+                                                            if (item.widthDecimal) {
+                                                                span(class: 'fa fa-fw fa-hashtag text-muted small', title: 'Format', '')
+                                                                mkp.yield ' '
+                                                            }
                                                         }
                                                         CaseReportFormPreview.renderInput(builder, item)
                                                         if (item.units) {
@@ -279,12 +290,31 @@ class CaseReportFormPreview {
             builder << '<span class="fa fa-fw fa-lock"></span> Protected Health Information' << '\n'
         }
 
-        builder << '<span class="fa fa-fw fa-info-circle"></span> ' << item.descriptionLabel << '\n'
+        if (item.descriptionLabel) {
+            builder << '<span class="fa fa-fw fa-info-circle"></span> ' << item.descriptionLabel << '\n'
+        }
+
+        if (item.pageNumber) {
+            builder << '<span class="fa fa-fw fa-file-text-o"></span> Page number <code>' << item.pageNumber << '</code>\n'
+        }
+
+        if (item.widthDecimal) {
+            if (item.dataType == DataType.ST) {
+                builder << '<span class="fa fa-fw fa-hashtag"></span> The string can contain up to <code>' << item.widthDecimal[0..-4] << '</code> characters\n'
+            } else if (item.dataType == DataType.INT) {
+                builder << '<span class="fa fa-fw fa-hashtag"></span> The number can contain <code>' << item.widthDecimal[0..-4] << '</code> digits\n'
+            } else if (item.dataType == DataType.REAL) {
+                def match = item.widthDecimal =~ /(\d+)\((\d+)\)/
+                if (match) {
+                    builder << '<span class="fa fa-fw fa-hashtag"></span> The number can contain <code>' << match[0][1] << '</code> digits (with <code>' << match[0][2] << ' digit(s) after decimal point.</code> \n'
+                }
+            }
+        }
 
         if (item.displayStatus == DisplayStatus.HIDE) {
             builder << '<span class="fa fa-fw fa-eye-slash"></span> Hidden '
             if (item.simpleConditionalDisplay) {
-                builder << '(this item is shown when <code>' << item.conditionalDisplay.response.item.name << '</code> is '
+                builder << '(this item is shown when <code>' << (item.conditionalDisplay.response.item.leftItemText ?: item.conditionalDisplay.response.item.name) << '</code> is '
                 builder << '<code>' << item.conditionalDisplay.response.text << '<span class="text-muted">['
                 builder << item.conditionalDisplay.response.value << ']</span>' << '</code> with instructions '
                 builder << '<span class="text-warning">"' << item.conditionalDisplay.message << '"<span>'

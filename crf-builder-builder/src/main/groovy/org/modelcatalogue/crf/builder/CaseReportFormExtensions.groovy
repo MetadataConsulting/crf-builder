@@ -204,6 +204,20 @@ class CaseReportFormExtensions {
         section.pageNumber = normalize pageNumber
     }
 
+    /**
+     * The page number on which the section begins or where the item is placed.
+     *
+     * If using paper source documents and have a multi-page CRF, put in the printed page number.
+     *
+     * For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
+     * the data keyed in at a central location performing double data entry.
+     * @param section current section or item
+     * @param pageNumber page number with size up to 5 characters
+     */
+    static void pageNumber(HasPageNumber section, Number pageNumber) {
+        section.pageNumber = normalize pageNumber?.toString()
+    }
+
 
     // checkboxes and radios
     /**

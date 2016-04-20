@@ -14,7 +14,7 @@ import static org.modelcatalogue.crf.model.validation.ValidationConstants.WIDTH_
 @ValidWidthDecimal
 @ValidValidationMessage
 @ValidResponseType
-public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation {
+public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation, HasPageNumber {
 
     private static final String CALCULATION_RESPONSE_OPTIONS_TEXT = "calculation";
     private static final String RESPONSE_LABEL_SUFFIX = "_RL";
