@@ -4,6 +4,7 @@ import groovy.xml.StreamingMarkupBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.DisplayStatus
+import org.modelcatalogue.crf.model.GridGroup
 import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ResponseLayout
 import org.modelcatalogue.crf.model.ResponseOption
@@ -164,6 +165,11 @@ class CaseReportFormPreview {
                                                                 span(class: 'fa fa-fw fa-hashtag text-muted small', title: 'Format', '')
                                                                 mkp.yield ' '
                                                             }
+
+                                                            if (item.group && !(item.group instanceof GridGroup)) {
+                                                                span(class: 'fa fa-fw fa-object-group text-muted small', title: 'Group', '')
+                                                                mkp.yield ' '
+                                                            }
                                                         }
                                                         CaseReportFormPreview.renderInput(builder, item)
                                                         if (item.units) {
@@ -322,6 +328,10 @@ class CaseReportFormPreview {
                     builder << '<span class="fa fa-fw fa-hashtag"></span> The number can contain <code>' << match[0][1] << '</code> digits (with <code>' << match[0][2] << ' digit(s) after decimal point.</code> \n'
                 }
             }
+        }
+
+        if (item.group && !(item.group instanceof GridGroup)) {
+            builder << '<span class="fa fa-fw fa-object-group text-muted small" title="Group"></span> This item belongs to <code>' << item.group.label << '</code> group\n'
         }
 
         if (item.displayStatus == DisplayStatus.HIDE) {

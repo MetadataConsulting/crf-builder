@@ -460,22 +460,24 @@ section('II Body System') {
     }
 
 
-    row {
-        singleSelect('LYMPHNODES') {
-            description 'Lymph Nodes'
-            question 'Lymph Nodes'
-            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
-            value '(select one)'
-            dataType integer
-            required true
-            questionNumber 25
-        }
-        text('LYMPHNODES_COMMENTS') {
-            description 'Lymph Nodes Comments'
-            question 'Comments:(Required if Abnormal)'
-            dataType string
-            show {
-                when 'LYMPHNODES' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+    group('TEST') {
+        row {
+            singleSelect('LYMPHNODES') {
+                description 'Lymph Nodes'
+                question 'Lymph Nodes'
+                options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+                value '(select one)'
+                dataType integer
+                required true
+                questionNumber 25
+            }
+            text('LYMPHNODES_COMMENTS') {
+                description 'Lymph Nodes Comments'
+                question 'Comments:(Required if Abnormal)'
+                dataType string
+                show {
+                    when 'LYMPHNODES' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+                }
             }
         }
     }
