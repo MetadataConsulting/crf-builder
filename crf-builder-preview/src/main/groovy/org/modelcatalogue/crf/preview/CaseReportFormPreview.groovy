@@ -67,86 +67,103 @@ class CaseReportFormPreview {
                                 mkp.yield form.revisionNotes
                             }
                         }
-                        for (Section section in form.sections.values()) {
-                            div(class: "row") {
-                                div(class: "col-md-12") {
-                                    h1 {
-                                        span title: 'Title', section.title
-                                        mkp.yield " "
-                                        span(class: 'text-muted small pull-right', title: 'Label', section.label)
-                                    }
-                                    if (section.subtitle) {
-                                        h2(title: 'Subtitle') {
-                                            em { mkp.yieldUnescaped section.subtitle }
+                        ul(class: 'nav nav-tabs', role: 'tablist') {
+                            for (Section section in form.sections.values()) {
+                                Map<String, Object> args = [role: 'presentation']
+                                if (section == form.sections.values().first()) {
+                                    args.class = 'active'
+                                }
+                                li(args) {
+                                    a(section.label, 'data-toggle': 'tab', role: 'tab', href: "#${section.label.replaceAll('\\W','_')}", 'aria-controlls': section.label.replaceAll('\\W','_'))
+                                }
+                            }
+                        }
+                        div(class: 'tab-content') {
+                            for (Section section in form.sections.values()) {
+                                Map<String, Object> args = [class: "row tab-pane", role: "tabpanel", id: section.label.replaceAll('\\W','_') ]
+                                if (section == form.sections.values().first()) {
+                                    args['class'] = "${args['class']} active"
+                                }
+                                div(args) {
+                                    div(class: "col-md-12") {
+                                        h1 {
+                                            span title: 'Title', section.title
+                                            mkp.yield " "
+                                            span(class: 'text-muted small pull-right', title: 'Label', section.label)
                                         }
-                                    }
-                                    if (section.instructions) {
-                                        div(title: 'Instructions', class: 'alert alert-info') {
-                                            mkp.yieldUnescaped section.instructions
+                                        if (section.subtitle) {
+                                            h2(title: 'Subtitle') {
+                                                em { mkp.yieldUnescaped section.subtitle }
+                                            }
                                         }
-                                    }
-                                    if (section.pageNumber) {
-                                        div(title: 'Page Number', class: 'alert alert-info') {
-                                            mkp.yieldUnescaped "The section starts at page "
-                                            strong section.pageNumber
+                                        if (section.instructions) {
+                                            div(title: 'Instructions', class: 'alert alert-info') {
+                                                mkp.yieldUnescaped section.instructions
+                                            }
                                         }
-                                    }
+                                        if (section.pageNumber) {
+                                            div(title: 'Page Number', class: 'alert alert-info') {
+                                                mkp.yieldUnescaped "The section starts at page "
+                                                strong section.pageNumber
+                                            }
+                                        }
 
-                                    for (Item item in section.items.values()) {
-                                        if (item.header) {
+                                        for (Item item in section.items.values()) {
+                                            if (item.header) {
+                                                div(class: 'row') {
+                                                    div(class: 'col-md-12') {
+                                                        h3 item.header, title: "Header"
+                                                    }
+                                                }
+                                            }
+                                            if (item.subheader) {
+                                                div(class: 'row') {
+                                                    div(class: 'col-md-12') {
+                                                        h4 title: "Subheader", {
+                                                            strong item.subheader
+                                                        }
+                                                    }
+                                                }
+                                            }
                                             div(class: 'row') {
                                                 div(class: 'col-md-12') {
-                                                    h3 item.header, title: "Header"
-                                                }
-                                            }
-                                        }
-                                        if (item.subheader) {
-                                            div(class: 'row') {
-                                                div(class: 'col-md-12') {
-                                                    h4 title: "Subheader", {
-                                                        strong item.subheader
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        div(class: 'row') {
-                                            div(class: 'col-md-12') {
-                                                div(class: 'form-group', 'data-content': buildPopover(item), title: item.name, 'data-toggle': 'popover', 'data-trigger': 'hover', 'data-placement': 'top', 'data-html': 'true') {
-                                                    label(for: item.name) {
-                                                        if (item.questionNumber) {
-                                                            mkp.yield item.questionNumber
-                                                            mkp.yield ' '
+                                                    div(class: 'form-group', 'data-content': buildPopover(item), title: item.name, 'data-toggle': 'popover', 'data-trigger': 'hover', 'data-placement': 'top', 'data-html': 'true') {
+                                                        label(for: item.name) {
+                                                            if (item.questionNumber) {
+                                                                mkp.yield item.questionNumber
+                                                                mkp.yield ' '
+                                                            }
+                                                            if (item.leftItemText) {
+                                                                mkp.yield(item.leftItemText)
+                                                                mkp.yield ' '
+                                                            }
+                                                            if (item.required) {
+                                                                span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
+                                                                mkp.yield ' '
+                                                            }
+                                                            if (item.phi) {
+                                                                span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
+                                                                mkp.yield ' '
+                                                            }
+                                                            if (item.displayStatus == DisplayStatus.HIDE) {
+                                                                span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
+                                                                mkp.yield ' '
+                                                            }
                                                         }
-                                                        if (item.leftItemText) {
-                                                            mkp.yield(item.leftItemText)
-                                                            mkp.yield ' '
+                                                        CaseReportFormPreview.renderInput(builder, item)
+                                                        if (item.units) {
+                                                            span("$item.units")
                                                         }
-                                                        if (item.required) {
-                                                            span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
-                                                            mkp.yield ' '
-                                                        }
-                                                        if (item.phi) {
-                                                            span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
-                                                            mkp.yield ' '
-                                                        }
-                                                        if (item.displayStatus == DisplayStatus.HIDE) {
-                                                            span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
-                                                            mkp.yield ' '
+                                                        if (item.rightItemText) {
+                                                            span(item.rightItemText)
                                                         }
                                                     }
-                                                    CaseReportFormPreview.renderInput(builder, item)
-                                                    if (item.units) {
-                                                        span("$item.units")
-                                                    }
-                                                    if (item.rightItemText) {
-                                                        span(item.rightItemText)
-                                                    }
-                                                }
 
+                                                }
                                             }
                                         }
+
                                     }
-
                                 }
                             }
                         }
