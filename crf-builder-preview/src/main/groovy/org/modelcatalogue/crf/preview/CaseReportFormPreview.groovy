@@ -2,7 +2,9 @@ package org.modelcatalogue.crf.preview
 
 import groovy.xml.StreamingMarkupBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
+import org.modelcatalogue.crf.model.DisplayStatus
 import org.modelcatalogue.crf.model.Item
+import org.modelcatalogue.crf.model.ResponseLayout
 import org.modelcatalogue.crf.model.ResponseOption
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.Section
@@ -26,6 +28,27 @@ class CaseReportFormPreview {
                     title(form.name ?: UNTITLED_FORM_NAME)
                     link(rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css','')
                     link(rel: 'stylesheet', href: 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css','')
+
+                    style {
+                        //language=CSS
+                        mkp.yieldUnescaped '''
+                            .popover, .popover-content {
+                                width: 400px;
+                                min-width: 700px;
+                            }
+                        '''.stripIndent().trim()
+                    }
+
+                    script(src: "https://code.jquery.com/jquery-1.12.3.min.js", integrity: "sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=", crossorigin: "anonymous", '')
+                    script(src: "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js", '')
+                    script(type: 'text/javascript') {
+                        //language=JavaScript
+                        mkp.yieldUnescaped '''
+                            $(function () {
+                              $('[data-toggle="popover"]').popover()
+                            })
+                        '''.stripIndent().trim()
+                    }
                 }
                 body {
                     div(class: 'container', style: 'margin-top: 50px;') {
@@ -88,12 +111,36 @@ class CaseReportFormPreview {
                                         }
                                         div(class: 'row') {
                                             div(class: 'col-md-12') {
-                                                div(class: 'form-group') {
-                                                    h4 {
-                                                        mkp.yield item.descriptionLabel
-                                                        span(class: 'pull-right small text-muted', item.name)
+                                                div(class: 'form-group', 'data-content': buildPopover(item), title: item.name, 'data-toggle': 'popover', 'data-trigger': 'hover', 'data-placement': 'top', 'data-html': 'true') {
+                                                    label(for: item.name) {
+                                                        if (item.questionNumber) {
+                                                            mkp.yield item.questionNumber
+                                                            mkp.yield ' '
+                                                        }
+                                                        if (item.leftItemText) {
+                                                            mkp.yield(item.leftItemText)
+                                                            mkp.yield ' '
+                                                        }
+                                                        if (item.required) {
+                                                            span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
+                                                            mkp.yield ' '
+                                                        }
+                                                        if (item.phi) {
+                                                            span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
+                                                            mkp.yield ' '
+                                                        }
+                                                        if (item.displayStatus == DisplayStatus.HIDE) {
+                                                            span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
+                                                            mkp.yield ' '
+                                                        }
                                                     }
                                                     CaseReportFormPreview.renderInput(builder, item)
+                                                    if (item.units) {
+                                                        span("$item.units")
+                                                    }
+                                                    if (item.rightItemText) {
+                                                        span(item.rightItemText)
+                                                    }
                                                 }
 
                                             }
@@ -112,29 +159,51 @@ class CaseReportFormPreview {
     private static void renderInput(builder, Item item) {
         switch (item.responseType) {
             case ResponseType.TEXT:
-                builder.input type: 'text', class: 'form-control', id: item.name, value: item.defaultValue ?: ''
+                builder.input type: 'text', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
                 break;
             case ResponseType.TEXTAREA:
-                builder.textarea class: 'form-control', id: item.name, item.defaultValue ?: ''
+                builder.textarea class: 'form-control', id: item.name, name: item.name, item.defaultValue ?: ''
                 break;
             case ResponseType.SINGLE_SELECT:
-                builder.select(class: 'form-control', id: item.name) {
+                builder.select(class: 'form-control', id: item.name, name: item.name) {
                     renderOptions(builder, item)
                 }
                 break;
             case ResponseType.MULTI_SELECT:
-                builder.select(class: 'form-control', id: item.name, multiple: '') {
+                builder.select(class: 'form-control', id: item.name, name: item.name, multiple: '') {
                     renderOptions(builder, item)
                 }
                 break;
             case ResponseType.FILE:
-                builder.input type: 'file', class: 'form-control', id: item.name, value: item.defaultValue ?: ''
+                builder.input type: 'file', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
                 break;
             case ResponseType.CHECKBOX:
-                builder.input type: 'checkbox', class: 'form-control', id: item.name
+                for (ResponseOption option in item.responseOptions) {
+                    builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'checkbox-inline' : 'checkbox') {
+                        label {
+                            Map<String, Object> args = [type: 'checkbox', name: item.name, value: option.value]
+                            if (item.defaultValue == option.value) {
+                                args.checked = 'checked'
+                            }
+                            input args
+                            mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
+                        }
+                    }
+                }
                 break;
             case ResponseType.RADIO:
-                builder.input type: 'radio', class: 'form-control', id: item.name
+                for (ResponseOption option in item.responseOptions) {
+                    builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'radio-inline' : 'radio') {
+                        label {
+                            Map<String, Object> args = [type: 'radio', name: item.name, value: option.value]
+                            if (item.defaultValue == option.value) {
+                                args.checked = 'checked'
+                            }
+                            input args
+                            mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
+                        }
+                    }
+                }
                 break;
             case ResponseType.CALCULATION:
                 builder.div class: 'alert alert-info', {
@@ -169,8 +238,43 @@ class CaseReportFormPreview {
             if (item.defaultValue == responseOption.value) {
                 args.selected = 'selected'
             }
-            builder.option(args, responseOption.text)
+            builder.option(args, "$responseOption.text [$responseOption.value]")
         }
     }
 
+    private static String buildPopover(Item item) {
+        StringBuilder builder =  new StringBuilder()
+        builder << '<div style="white-space: pre-line;">'
+
+        if (item.required) {
+            builder << '<span class="fa fa-fw fa-asterisk"></span> Required' << '\n'
+        }
+
+        if (item.dataType) {
+            builder << '<span class="fa fa-fw fa-table"></span> '<< item.dataType.humanReadable << '\n'
+        }
+
+        if (item.phi) {
+            builder << '<span class="fa fa-fw fa-lock"></span> Protected Health Information' << '\n'
+        }
+
+        builder << '<span class="fa fa-fw fa-info-circle"></span> ' << item.descriptionLabel << '\n'
+
+        if (item.displayStatus == DisplayStatus.HIDE) {
+            builder << '<span class="fa fa-fw fa-eye-slash"></span> Hidden '
+            if (item.simpleConditionalDisplay) {
+                builder << '(show when <code>' << item.conditionalDisplay.response.item.name << '</code> is '
+                builder << '<code>' << item.conditionalDisplay.response.text << '<span class="text-muted">['
+                builder << item.conditionalDisplay.response.value << ']</span>' << '</code> with instructions '
+                builder << '<span class="text-warning">"' << item.conditionalDisplay.message << '"<span>'
+                builder << ')'
+            }
+
+            builder << '\n'
+
+        }
+
+        builder << '</div>'
+        return builder.toString()
+    }
 }

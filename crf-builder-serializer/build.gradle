@@ -1,6 +1,6 @@
 dependencies {
     compile project(':crf-builder-model')
-    compile 'org.apache.poi:poi:3.11'
+    compile 'org.apache.poi:poi:3.14'
 
     testCompile project(':crf-builder-builder')
 

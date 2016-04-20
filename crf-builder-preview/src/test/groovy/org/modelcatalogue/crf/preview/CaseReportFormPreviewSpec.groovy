@@ -3,6 +3,7 @@ package org.modelcatalogue.crf.preview
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.modelcatalogue.crf.model.CaseReportForm
+import org.modelcatalogue.crf.serializer.CaseReportFormSerializer
 import spock.lang.Specification
 
 class CaseReportFormPreviewSpec extends Specification {
@@ -19,7 +20,14 @@ class CaseReportFormPreviewSpec extends Specification {
         new CaseReportFormPreview(form).write(out)
         String html = out.toString()
 
-        new File(System.getProperty('java.io.tmpdir'), 'crf-builder-preview.html').text = html
+        File testFolder = new File(System.getProperty('user.dir'), 'crf-builder-preview')
+        testFolder.mkdirs()
+        File testFile = new File(testFolder, 'crf-builder-preview.html')
+        testFile.text = html
+
+        println "Test file created at: $testFile.canonicalPath"
+
+        new CaseReportFormSerializer(form).write(new File(testFolder, 'crf-builder-preview.xls').newOutputStream())
 
         then:
         html

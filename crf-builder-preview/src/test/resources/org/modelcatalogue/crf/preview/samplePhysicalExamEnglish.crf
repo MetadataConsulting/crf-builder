@@ -67,12 +67,11 @@ section('I Basic') {
         }
     }
 
-    text ('RESPIRATION') {
+    file ('RESPIRATION') {
         description 'Respiration Rate'
         question 'Respiration Rate:'
         units 'per min'
         questionNumber 7
-        dataType integer
         validate ('Respiratory rate out of expected range of 10-22 (must be an integer)') {
             range(10,22)
         }
@@ -162,11 +161,10 @@ section('II Body System') {
 
 
     row {
-        singleSelect('HEENT') {
+        radio('HEENT') {
             description 'H/E/E/N/T'
             question 'H/E/E/N/T'
             options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
-            value '(select one)'
             dataType integer
             required true
             questionNumber 11
@@ -212,6 +210,7 @@ section('II Body System') {
             dataType integer
             required true
             questionNumber 13
+            phi true
         }
         text('CHEST_COMMENTS') {
             description 'Chest Comments'
@@ -225,11 +224,12 @@ section('II Body System') {
 
 
     row {
-        singleSelect('LUNGS') {
+        radio('LUNGS') {
+            layout horizontal
             description 'Lungs'
             question 'Lungs'
             options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
-            value '(select one)'
+            value '2'
             dataType integer
             required true
             questionNumber 14
@@ -288,11 +288,11 @@ section('II Body System') {
 
 
     row {
-        singleSelect('ABDOMEN') {
+        checkbox('ABDOMEN') {
             description 'Abdomen'
             question 'Abdomen'
             options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
-            value '(select one)'
+            value '1'
             dataType integer
             required true
             questionNumber 17
@@ -330,7 +330,8 @@ section('II Body System') {
 
 
     row {
-        singleSelect('GENITALIA') {
+        checkbox('GENITALIA') {
+            layout horizontal
             description 'Genitalia'
             question 'Genitalia'
             options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
