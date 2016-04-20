@@ -42,9 +42,7 @@ class CaseReportFormPreview {
                                 table-layout: fixed;
                             }
                             label {
-                                border-bottom-style: dashed;
-                                border-bottom-color: gray;
-                                border-bottom-width: 1px;
+                                border-bottom: 1px dashed gray;
                             }
                         '''.stripIndent().trim()
                     }
