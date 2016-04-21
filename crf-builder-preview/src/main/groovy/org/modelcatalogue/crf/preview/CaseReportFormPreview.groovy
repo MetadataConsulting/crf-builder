@@ -48,6 +48,9 @@ class CaseReportFormPreview {
                                 font-size: 12px;
                                 padding-top: 6px;
                             }
+                            .question-number::after {
+                                content: " ";
+                            }
                         '''.stripIndent().trim()
                     }
 
@@ -404,8 +407,7 @@ class CaseReportFormPreview {
     private static void renderLabel(builder, Item item, String clazz) {
         builder.label(for: item.name, class: "control-label $clazz") {
             if (item.questionNumber) {
-                mkp.yield item.questionNumber
-                mkp.yield ' '
+                span(class: 'question-number pull-left', item.questionNumber)
             }
             if (item.leftItemText) {
                 mkp.yield(item.leftItemText)
