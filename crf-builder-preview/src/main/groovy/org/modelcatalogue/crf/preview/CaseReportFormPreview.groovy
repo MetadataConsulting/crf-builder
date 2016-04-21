@@ -207,6 +207,7 @@ class CaseReportFormPreview {
                                             if (!item.columnNumber || item.columnNumber == 1) {
                                                 mkp.yieldUnescaped '<div class="row">'
                                             }
+
                                             div(class: getCellClassForCount(count)) {
                                                 form(class: 'form-horizontal') {
                                                     div(addDataItemPopover(class: 'form-group form-group-sm', item)) {
@@ -556,6 +557,10 @@ class CaseReportFormPreview {
                 currentRow.clear()
             }
             currentRow << item
+        }
+
+        for (Item i in currentRow) {
+            counts[i.name] = currentRow.size()
         }
 
         return counts
