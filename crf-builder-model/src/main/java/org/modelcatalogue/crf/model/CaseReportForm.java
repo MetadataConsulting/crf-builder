@@ -1,12 +1,14 @@
 package org.modelcatalogue.crf.model;
 
+import org.modelcatalogue.crf.model.validation.AlphaNumeric;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import java.util.*;
 
-import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_PATTERN;
 
 public class CaseReportForm {
 
@@ -17,7 +19,7 @@ public class CaseReportForm {
      *
      * If the field is blank, the CRF will be rejected at upload time.
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_PATTERN) private String name;
+    @NotNull @Size(min = 1, max = 255) @AlphaNumeric private String name;
 
     /**
      * Defines the version of the CRF as it will be displayed in the OpenClinica user interface.
@@ -32,7 +34,7 @@ public class CaseReportForm {
      * A new version of a CRF would be needed due to a protocol change, adding or removing an item from a CRF, or
      * changing some of the questions.
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_PATTERN) private String version;
+    @NotNull @Size(min = 1, max = 255) @AlphaNumeric private String version;
 
 
     /**
@@ -41,7 +43,7 @@ public class CaseReportForm {
      * This information appears as part of the CRF Metadata when the user clicks on View (original). This information
      * is not displayed during data entry.
      */
-    @NotNull @Size(min = 1, max = 4000) @Pattern(regexp = ALPHA_NUMERIC_PATTERN) private String versionDescription;
+    @NotNull @Size(min = 1, max = 4000) @AlphaNumeric private String versionDescription;
 
     /**
      * This field is used to keep track of the revisions you made to this particular CRF.
@@ -54,10 +56,10 @@ public class CaseReportForm {
      * and each subsequent version.
      *
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_PATTERN) private String revisionNotes;
+    @NotNull @Size(min = 1, max = 255) private String revisionNotes;
 
 
-    @Size(min = 1) private Map<String, Section> sections = new LinkedHashMap<String, Section>();
+    @Size(min = 1) @Valid private Map<String, Section> sections = new LinkedHashMap<String, Section>();
 
     public Section section(String label) {
         if (sections.containsKey(label)) {

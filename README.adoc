@@ -34,6 +34,21 @@ Errors errors = binder.getBindingResult();                                      
 <5> Validate the form
 <6> Get the errors
 
+## Preview
+
+Form preview displays the form created manually or using builder as HTML preview. It also displays validation errors.
+[source,java]
+----
+File destination = new File("preview.html");                                    // <1>
+FileOutputStream fos = new FileOutputStream(destination);                       // <2>
+CaseReportFormPreview preview = new CaseReportFormPreview(form)                 // <3>
+preview.write(fos);                                                             // <4>
+----
+<1> File to be written
+<2> Create new FileOutputStream for given file
+<3> Create new CaseReportFormPreview for given form
+<4> Write preview to the file
+
 ## Serializer
 
 Form serializer exports the model created manually or using builder to Excel file which can be imported to OpenClinica.

@@ -7,14 +7,11 @@ import javax.validation.constraints.*;
 
 import java.util.*;
 
-import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_ENGLISH_NO_SPACES_PATTERN;
-import static org.modelcatalogue.crf.model.validation.ValidationConstants.WIDTH_DECIMAL_PATTERN;
-
 @ValidDefaultValue
 @ValidWidthDecimal
 @ValidValidationMessage
 @ValidResponseType
-public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation {
+public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, Checkbox, Calculation, File, InstantCalculation, GroupCalculation, HasPageNumber {
 
     private static final String CALCULATION_RESPONSE_OPTIONS_TEXT = "calculation";
     private static final String RESPONSE_LABEL_SUFFIX = "_RL";
@@ -78,7 +75,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * name cannot be modified within the CRF. See "CRF Versioning" and "Scope of CRFs and Items" in this document
      * for more detail.
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_ENGLISH_NO_SPACES_PATTERN) private String name;
+    @NotNull @Size(min = 1, max = 255) @AlphaNumericEnglishNoSpaces private String name;
 
     /**
      * The description or definition of the item. Should give an explanation of the data element and the value(s) it
@@ -240,7 +237,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
      * the data keyed in at a central location performing double data entry.
      */
-    @Size(max = 5) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String pageNumber;
+    @Size(max = 5) @AlphaNumeric private String pageNumber;
 
     /**
      * This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the
@@ -248,7 +245,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      *
      * This field allows you to specify questions as 1, 2, 2a etc. in a field.
      */
-    @Size(max = 20) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String questionNumber;
+    @Size(max = 20) @AlphaNumeric private String questionNumber;
 
     /**
      * The types of responses are based on standard HTML elements web browsers can display in a form. Allowed use of
@@ -269,7 +266,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * the RESPONSE_OPTIONS_TEXT and RESPONSE_VALUES_OR_CALCULATIONS must be left blank or exactly match the values of
      * the original RESPONSE_LABEL in the CRF.
      */
-    @Size(max = 80) @Pattern(regexp = ValidationConstants.ALPHA_NUMERIC_PATTERN) private String responseLabel;
+    @Size(max = 80) @AlphaNumeric private String responseLabel;
 
     /**
      * A comma delimited string of values that will be used as the options to be chosen by a data entry person when
@@ -398,7 +395,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * expression to verify the input.
      *
      */
-    @Pattern(regexp = WIDTH_DECIMAL_PATTERN) private String widthDecimal;
+     @WidthDecimalPattern private String widthDecimal;
 
     /**
      * Specify a validation expression to run an edit check on this item at the point of data entry.
@@ -484,7 +481,7 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
      * Instead of Rules, you can also use the SIMPLE_CONDITIONAL_DISPLAY field to decide when this item should be shown.
      * SIMPLE_CONDITIONAL_DISPLAY only works with items set to HIDE.
      */
-    @NotNull private DisplayStatus displayStatus;
+    @NotNull private DisplayStatus displayStatus = DisplayStatus.SHOW;
 
     /**
      * Contains 3 parts, all separated by a comma:  ITEM_NAME, RESPONSE_VALUE, Message.

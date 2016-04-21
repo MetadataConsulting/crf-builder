@@ -1,0 +1,513 @@
+name 'Sample Physical Exam &*{}'
+version 'English &*{}'
+versionDescription 'Sample Physical Exam &*{}'
+revisionNotes 'htaycher 09-19-2012 &*{}'
+
+section('x' * 256) {
+    title('x' * 2001)
+    subtitle('x' * 2001)
+    instructions('x' * 2001)
+    pageNumber('x' * 6)
+    row {
+        text('PEDAT') {
+            header 'Visit Information:'
+            description 'Date of Physical Exam'
+            question 'Date of Physical Examination:'
+            questionNumber 1
+            dataType date
+        }
+        text('PETIM') {
+            description 'Time of Physical Exam'
+            question 'Time of Physical Examination:'
+            units 'HH:MM'
+            questionNumber 2
+            dataType string
+            length 5
+            regexp(/([01][0-9]|2[0-3]):[0-5][0-9]/, 'Please enter the time in the 24 hour format (HH:MM)')
+        }
+    }
+
+    row {
+        text('HEIGHT') {
+            header 'Physical Exam Information:'
+            description 'Height'
+            question 'Height:'
+            units 'in'
+            questionNumber 3
+            dataType real
+            digits 5,2
+        }
+        text('WEIGHT') {
+            description 'Weight'
+            question 'Weight:'
+            units 'lb'
+            questionNumber 4
+            dataType real
+        }
+    }
+
+    row {
+        text('TEMPERATURE') {
+            description 'Temperature'
+            question 'Temperature:'
+            units 'F'
+            questionNumber 5
+            dataType real
+            validate('Temperature out of expected range of 95-110 degrees F.') {
+                range(95,110)
+            }
+            pageNumber 2
+        }
+
+        text('PULSE') {
+            description 'Pulse Rate'
+            question 'Pulse Rate:'
+            units 'per min'
+            questionNumber 6
+            dataType integer
+            digits 3
+            validate('Pulse rate ouf of expected range of 60-100(must be an integer)') {
+                range(60,100)
+            }
+        }
+    }
+
+    file ('RESPIRATION') {
+        description 'Respiration Rate'
+        question 'Respiration Rate:'
+        units 'per min'
+        questionNumber 7
+        validate ('Respiratory rate out of expected range of 10-22 (must be an integer)') {
+            range(10,22)
+        }
+    }
+
+    row {
+        text('SYSTOLIC') {
+            header 'Blood pressure:'
+            description 'Systolic'
+            question 'Systolic:'
+            units 'mm'
+            questionNumber 8
+            dataType string
+            validate ('Out of expected range.Systolic expected range of 110-140.') {
+                range(110,140)
+            }
+        }
+
+    }
+
+    textarea('DIASTOLIC') {
+        description 'Diastolic'
+        question 'Diastolic:'
+        units('x' * 65)
+        dataType string
+        validate ('Out of expected range. Diastolic expected range of 70-90.') {
+            range(70, 90)
+        }
+
+    }
+}
+
+section('II Body System') {
+    title 'Body System/Site'
+    pageNumber "10"
+
+    calculation('BMI') {
+        description 'Body Mass Index'
+        question 'Body Mass Index:'
+        dataType real
+        formula '(WEIGHT/pow(HEIGHT,2))*703'
+    }
+
+    row {
+        multiSelect('APPEARANCE') {
+            header 'Body System / Site'
+            subheader 'If \'Abnormal\' is selected, comments are required.'
+
+            description 'Appearance'
+            question 'Appearance'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '2'
+            dataType integer
+            required true
+            questionNumber 9
+        }
+        text('APPEARANCE_COMMENTS') {
+            description 'Appearance Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'APPEARANCE' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('SKIN') {
+            description 'Skin'
+            question 'Skin'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 10
+        }
+        text('SKIN_COMMENTS') {
+            description 'Skin Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'SKIN' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        radio('HEENT') {
+            description 'H/E/E/N/T'
+            question 'H/E/E/N/T'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            dataType integer
+            required true
+            questionNumber 11
+        }
+        text('HEENT_COMMENTS') {
+            description 'H/E/E/N/T Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'HEENT' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('THYROID') {
+            description 'Thyroid'
+            question 'Thyroid'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 12
+        }
+        text('THYROID_COMMENTS') {
+            description 'Thyroid Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'THYROID' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('CHEST') {
+            description 'Chest'
+            question 'Chest'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 13
+            phi true
+        }
+        text('CHEST_COMMENTS') {
+            description 'Chest Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'CHEST' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        radio('LUNGS') {
+            layout horizontal
+            description 'Lungs'
+            question 'Lungs'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '2'
+            dataType integer
+            required true
+            questionNumber 14
+        }
+        text('LUNGS_COMMENTS') {
+            description 'Lungs Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'LUNGS' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('BREAST') {
+            description 'Breasts'
+            question 'Breasts'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 15
+        }
+        text('BREASTS_COMMENTS') {
+            description 'Breasts Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'BREAST' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('HEART') {
+            description 'Heart'
+            question 'Heart'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 16
+        }
+        text('HEART_COMMENTS') {
+            description 'Heart Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'HEART' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        checkbox('ABDOMEN') {
+            description 'Abdomen'
+            question 'Abdomen'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '1'
+            dataType integer
+            required true
+            questionNumber 17
+        }
+        text('ABDOMEN_COMMENTS') {
+            description 'Abdomen Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'ABDOMEN' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('MUSCULOSKELETAL') {
+            description 'Musculoskeletal'
+            question 'Musculoskeletal'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 18
+        }
+        text('MUSCULOSKELETAL_COMMENTS') {
+            description 'Musculoskeletal Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'MUSCULOSKELETAL' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        checkbox('GENITALIA') {
+            layout horizontal
+            description 'Genitalia'
+            question 'Genitalia'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 19
+        }
+        text('GENITALIA_COMMENTS') {
+            description 'Genitalia Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'GENITALIA' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('PELVIS') {
+            description 'Pelvis'
+            question 'Pelvis'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 20
+        }
+        text('PELVIS_COMMENTS') {
+            description 'Pelvis Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'PELVIS' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('RECTAL') {
+            description 'Rectal'
+            question 'Rectal'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 21
+        }
+        text('RECTAL_COMMENTS') {
+            description 'Rectal Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'RECTAL' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('PROSTATE') {
+            description 'Prostate'
+            question 'Prostate'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 22
+        }
+        text('PROSTATE_COMMENTS') {
+            description 'Prostate Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'PROSTATE' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('VASCULAR') {
+            description 'Vascular'
+            question 'Vascular'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 23
+        }
+        text('VASCULAR_COMMENTS') {
+            description 'Vascular Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'VASCULAR' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    row {
+        singleSelect('NEUROLOGICAL') {
+            description 'Neurological'
+            question 'Neurological'
+            options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+            value '(select one)'
+            dataType integer
+            required true
+            questionNumber 24
+        }
+        text('NEUROLOGICAL_COMMENTS') {
+            description 'Neurological Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+            show {
+                when 'NEUROLOGICAL' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+            }
+        }
+    }
+
+
+    group('TEST') {
+        row {
+            singleSelect('LYMPHNODES') {
+                description 'Lymph Nodes'
+                question 'Lymph Nodes'
+                options 'Normal':1, 'Abnormal': 2, 'Not Examined': 99
+                value '(select one)'
+                dataType integer
+                required true
+                questionNumber 25
+            }
+            text('LYMPHNODES_COMMENTS') {
+                description 'Lymph Nodes Comments'
+                question 'Comments:(Required if Abnormal)'
+                dataType string
+                show {
+                    when 'LYMPHNODES' is 2 otherwise 'If a comment has been entered, abnormal should be selected. Please update the value(s) or enter a discrepancy note before continuing to hit save.'
+                }
+            }
+        }
+    }
+
+}
+
+section('III Other') {
+    title 'Specify Other Body System/Site'
+
+    grid ('Other Body System Site') {
+        header 'Other Body System / Site'
+        rows 3
+        text('OTHERBODYSYSTEM{&}') {
+            description 'Other Body System/Site Description'
+            question 'Other Body System/Site:'
+            dataType string
+        }
+        singleSelect('OTHERBODYSYSTEM_STATUS') {
+            description 'Other Body System/Site Status'
+            question 'Status:'
+            options Normal: 1, Abnormal: 2
+            value '(select one)'
+            dataType integer
+            units 'A/N'
+        }
+        text('OTHERBODYSYSTEM_COMMENTS') {
+            description 'Other Body System/Site Comments'
+            question 'Comments:(Required if Abnormal)'
+            dataType string
+        }
+    }
+}
