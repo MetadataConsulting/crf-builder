@@ -2,6 +2,7 @@ package org.modelcatalogue.crf.model;
 
 import org.modelcatalogue.crf.model.validation.AlphaNumeric;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -58,7 +59,7 @@ public class CaseReportForm {
     @NotNull @Size(min = 1, max = 255) private String revisionNotes;
 
 
-    @Size(min = 1) private Map<String, Section> sections = new LinkedHashMap<String, Section>();
+    @Size(min = 1) @Valid private Map<String, Section> sections = new LinkedHashMap<String, Section>();
 
     public Section section(String label) {
         if (sections.containsKey(label)) {

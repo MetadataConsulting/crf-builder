@@ -178,8 +178,11 @@ class CaseReportFormPreview {
                                                     thead {
                                                         tr {
                                                             for (Item gridItem in grid.items.values()) {
-                                                                th(addDataItemPopover(gridItem, class: getCellClassForCount(grid.items.size()))) {
-                                                                    renderLabel(builder, gridItem, 'col-md-12')
+                                                                Set<ConstraintViolation> violations = validate(gridItem)
+                                                                th(addDataItemPopover(gridItem, violations, class: getCellClassForCount(grid.items.size()))) {
+                                                                    div (class: violations ? 'form-group has-feedback has-error' : 'form-group'){
+                                                                        renderLabel(builder, gridItem, 'col-md-12')
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -188,9 +191,12 @@ class CaseReportFormPreview {
                                                         (grid.repeatNum ?: 1).times {
                                                             builder.tr {
                                                                 for (Item gridItem in grid.items.values()) {
+                                                                    Set<ConstraintViolation> violations = validate(gridItem)
                                                                     td class: getCellClassForCount(grid.items.size()), {
-                                                                        renderInput(builder, gridItem, 'col-md-9')
-                                                                        renderUnitsAndRightItemText(builder, gridItem, false)
+                                                                        div (class: violations ? 'form-group has-feedback has-error' : 'form-group'){
+                                                                            renderInput(builder, gridItem, 'col-md-9')
+                                                                            renderUnitsAndRightItemText(builder, gridItem, false)
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -210,7 +216,12 @@ class CaseReportFormPreview {
 
                                             div(class: getCellClassForCount(count)) {
                                                 form(class: 'form-horizontal') {
-                                                    div(addDataItemPopover(class: 'form-group form-group-sm', item)) {
+                                                    String itemClass = 'form-group form-group-sm'
+                                                    Set<ConstraintViolation> violations = validate(item)
+                                                    if (violations) {
+                                                        itemClass = "$itemClass has-feedback has-error"
+                                                    }
+                                                    div(addDataItemPopover(class: itemClass, item, violations)) {
                                                         renderLabel(builder, item, 'col-md-3')
                                                         renderInput(builder, item, 'col-md-6')
                                                         renderUnitsAndRightItemText(builder, item, true)
@@ -236,9 +247,15 @@ class CaseReportFormPreview {
         if (constraintViolations) {
             builder.div(class: 'row') {
                 for (ConstraintViolation violation in constraintViolations) {
+                    if (violation.rootBean != violation.leafBean) {
+                        // do not render deep validation errors
+                        continue
+                    }
                     div(class: 'col-md-12') {
                         div(class: 'alert alert-danger') {
-                            mkp.yield "'$violation.propertyPath' "
+                            if (violation.propertyPath) {
+                                mkp.yieldUnescaped "<strong>${camelToNatural(violation.propertyPath.toString())}</strong> "
+                            }
                             mkp.yield violation.message
                         }
                     }
@@ -250,7 +267,7 @@ class CaseReportFormPreview {
     private static Set<ConstraintViolation> validate(Object what) {
         try {
             Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-            return validator.validate(what)
+            return validator.validate(what).findAll { it.rootBean == it.leafBean }
         } catch (e) {
             System.err.println """
                 Cannot create validator: $e
@@ -396,7 +413,7 @@ class CaseReportFormPreview {
         }
     }
 
-    private static String buildPopover(Item item) {
+    private static String buildPopover(Item item, Set<ConstraintViolation> violations) {
         StringBuilder builder =  new StringBuilder()
         builder << '<div style="white-space: pre-line;">'
 
@@ -460,6 +477,17 @@ class CaseReportFormPreview {
 
         }
 
+        for (ConstraintViolation violation in violations) {
+            builder << '<span class="text-danger">'
+            builder << '<span class="fa fa-fw fa-exclamation-triangle"></span> '
+            if (violation.propertyPath) {
+                builder << '<strong>' << camelToNatural(violation.propertyPath.toString()) << '</strong> '
+            }
+            builder << violation.message
+            builder << '</span>\n'
+
+        }
+
         builder << '</div>'
         return builder.toString()
     }
@@ -486,34 +514,34 @@ class CaseReportFormPreview {
                 mkp.yield ' '
             }
             if (item.required) {
-                span(class: 'fa fa-fw fa-asterisk text-muted small', title: 'Required', '')
+                span(class: 'fa fa-fw fa-asterisk small', title: 'Required', '')
                 mkp.yield ' '
             }
             if (item.phi) {
-                span(class: 'fa fa-fw fa-lock text-muted small', title: 'Protected Health Information', '')
+                span(class: 'fa fa-fw fa-lock small', title: 'Protected Health Information', '')
                 mkp.yield ' '
             }
             if (item.displayStatus == DisplayStatus.HIDE) {
-                span(class: 'fa fa-fw fa-eye-slash text-muted small', title: 'Hidden', '')
+                span(class: 'fa fa-fw fa-eye-slash small', title: 'Hidden', '')
                 mkp.yield ' '
             }
             if (item.validation) {
-                span(class: 'fa fa-fw fa-check-circle text-muted small', title: 'Validation', '')
+                span(class: 'fa fa-fw fa-check-circle small', title: 'Validation', '')
                 mkp.yield ' '
             }
 
             if (item.pageNumber) {
-                span(class: 'fa fa-fw fa-file-text-o text-muted small', title: 'Page Number', '')
+                span(class: 'fa fa-fw fa-file-text-o small', title: 'Page Number', '')
                 mkp.yield ' '
             }
 
             if (item.widthDecimal) {
-                span(class: 'fa fa-fw fa-hashtag text-muted small', title: 'Format', '')
+                span(class: 'fa fa-fw fa-hashtag small', title: 'Format', '')
                 mkp.yield ' '
             }
 
             if (item.group && !(item.group instanceof GridGroup)) {
-                span(class: 'fa fa-fw fa-object-group text-muted small', title: 'Group', '')
+                span(class: 'fa fa-fw fa-object-group small', title: 'Group', '')
                 mkp.yield ' '
             }
         }
@@ -532,8 +560,8 @@ class CaseReportFormPreview {
         builder.span(class: 'col-md-3 units', sb.toString())
     }
 
-    private static Map<String, Object> addDataItemPopover(Map<String, Object> args = [:], Item item) {
-        args.putAll 'data-content': buildPopover(item),
+    private static Map<String, Object> addDataItemPopover(Map<String, Object> args = [:], Item item, Set<ConstraintViolation> violations) {
+        args.putAll 'data-content': buildPopover(item, violations),
                 title: item.name,
                 'data-toggle': 'popover',
                 'data-trigger': 'hover',
@@ -564,5 +592,17 @@ class CaseReportFormPreview {
         }
 
         return counts
+    }
+
+    private static String camelToNatural(String s) {
+        // http://stackoverflow.com/questions/2559759/how-do-i-convert-camelcase-into-human-readable-names-in-java
+        return s.replaceAll(
+                String.format("%s|%s|%s",
+                        "(?<=[A-Z])(?=[A-Z][a-z])",
+                        "(?<=[^A-Z])(?=[A-Z])",
+                        "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ),
+                " "
+        ).split(/\s+/).collect { it.capitalize() }.join(' ');
     }
 }

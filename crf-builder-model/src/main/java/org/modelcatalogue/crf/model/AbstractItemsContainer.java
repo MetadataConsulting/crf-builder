@@ -1,14 +1,15 @@
 package org.modelcatalogue.crf.model;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class AbstractItemsContainer implements ItemContainer {
+abstract class AbstractItemsContainer implements ItemContainer {
 
-    protected AbstractItemsContainer() {}
+    AbstractItemsContainer() {}
 
-    protected Map<String, Item> items = new LinkedHashMap<String, Item>();
+    @Valid protected Map<String, Item> items = new LinkedHashMap<String, Item>();
 
     private Item item(ResponseType type, String name) {
         if (items.containsKey(name)) {

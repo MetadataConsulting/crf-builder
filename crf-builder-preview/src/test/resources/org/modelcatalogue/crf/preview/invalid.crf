@@ -100,7 +100,7 @@ section('x' * 256) {
     textarea('DIASTOLIC') {
         description 'Diastolic'
         question 'Diastolic:'
-        units 'Hg'
+        units('x' * 65)
         dataType string
         validate ('Out of expected range. Diastolic expected range of 70-90.') {
             range(70, 90)
@@ -491,7 +491,7 @@ section('III Other') {
     grid ('Other Body System Site') {
         header 'Other Body System / Site'
         rows 0
-        text('OTHERBODYSYSTEM') {
+        text('OTHERBODYSYSTEM{&}') {
             description 'Other Body System/Site Description'
             question 'Other Body System/Site:'
             dataType string

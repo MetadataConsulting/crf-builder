@@ -2,6 +2,7 @@ package org.modelcatalogue.crf.model;
 
 import org.modelcatalogue.crf.model.validation.AlphaNumeric;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -76,7 +77,7 @@ public class Section extends AbstractItemsContainer implements HasPageNumber {
         return item;
     }
 
-    private Map<String, Group> groups = new LinkedHashMap<String, Group>();
+    @Valid private Map<String, Group> groups = new LinkedHashMap<String, Group>();
 
     /**
      * Creates new non-repeating group with given label.
