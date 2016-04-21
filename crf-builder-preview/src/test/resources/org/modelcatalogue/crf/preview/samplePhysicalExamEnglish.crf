@@ -96,7 +96,7 @@ section('I Basic') {
 
     }
 
-    text('DIASTOLIC') {
+    textarea('DIASTOLIC') {
         description 'Diastolic'
         question 'Diastolic:'
         units 'Hg'

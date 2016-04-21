@@ -41,8 +41,12 @@ class CaseReportFormPreview {
                             .table-fixed {
                                 table-layout: fixed;
                             }
-                            label {
-                                border-bottom: 1px dashed gray;
+                            .container-fluid {
+                                margin-top: 15px;
+                            }
+                            .units {
+                                font-size: 12px;
+                                padding-top: 6px;
                             }
                         '''.stripIndent().trim()
                     }
@@ -59,7 +63,7 @@ class CaseReportFormPreview {
                     }
                 }
                 body {
-                    div(class: 'container', style: 'margin-top: 50px;') {
+                    div(class: 'container-fluid') {
                         mkp.yieldUnescaped '''<a href="https://github.com/MetadataRegistry/crf-builder/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>'''
                         div(class: 'jumbotron') {
                             h1(caseReportForm.name ?: UNTITLED_FORM_NAME)
@@ -166,7 +170,7 @@ class CaseReportFormPreview {
                                                         tr {
                                                             for (Item gridItem in grid.items.values()) {
                                                                 th(addDataItemPopover(gridItem, class: getCellClassForCount(grid.items.size()))) {
-                                                                    renderLabel(builder, gridItem)
+                                                                    renderLabel(builder, gridItem, 'col-md-12')
                                                                 }
                                                             }
                                                         }
@@ -176,8 +180,8 @@ class CaseReportFormPreview {
                                                             builder.tr {
                                                                 for (Item gridItem in grid.items.values()) {
                                                                     td class: getCellClassForCount(grid.items.size()), {
-                                                                        renderInput(builder, gridItem)
-                                                                        renderUnits(builder, gridItem)
+                                                                        renderInput(builder, gridItem, 'col-md-9')
+                                                                        renderUnitsAndRightItemText(builder, gridItem, false)
                                                                     }
                                                                 }
                                                             }
@@ -192,15 +196,13 @@ class CaseReportFormPreview {
 
                                             div(class: 'row') {
                                                 div(class: 'col-md-12') {
-                                                    div(addDataItemPopover(class: 'form-group', item)) {
-                                                        renderLabel(builder, item)
-                                                        renderInput(builder, item)
-                                                        renderUnits(builder, item)
-                                                        if (item.rightItemText) {
-                                                            span(item.rightItemText)
+                                                    form(class: 'form-horizontal') {
+                                                        div(addDataItemPopover(class: 'form-group form-group-sm', item)) {
+                                                            renderLabel(builder, item, 'col-md-3')
+                                                            renderInput(builder, item, 'col-md-6')
+                                                            renderUnitsAndRightItemText(builder, item, true)
                                                         }
                                                     }
-
                                                 }
                                             }
                                         }
@@ -219,89 +221,91 @@ class CaseReportFormPreview {
         section.label.replaceAll('\\W', '_')
     }
 
-    private static void renderInput(builder, Item item) {
-        switch (item.responseType) {
-            case ResponseType.TEXT:
-                switch (item.dataType) {
-                    case DataType.INT:
-                    case DataType.REAL:
-                        builder.input type: 'number', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
-                        break
-                    case DataType.DATE:
-                    case DataType.PDATE:
-                        builder.input type: 'date', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
-                        break
-                    case DataType.ST:
-                    default:
-                        builder.input type: 'text', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
-                        break
-                }
-                break;
-            case ResponseType.TEXTAREA:
-                builder.textarea class: 'form-control', id: item.name, name: item.name, item.defaultValue ?: ''
-                break;
-            case ResponseType.SINGLE_SELECT:
-                builder.select(class: 'form-control', id: item.name, name: item.name) {
-                    renderOptions(builder, item)
-                }
-                break;
-            case ResponseType.MULTI_SELECT:
-                builder.select(class: 'form-control', id: item.name, name: item.name, multiple: '') {
-                    renderOptions(builder, item)
-                }
-                break;
-            case ResponseType.FILE:
-                builder.input type: 'file', class: 'form-control', id: item.name, name: item.name, value: item.defaultValue ?: ''
-                break;
-            case ResponseType.CHECKBOX:
-                for (ResponseOption option in item.responseOptions) {
-                    builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'checkbox-inline' : 'checkbox') {
-                        label {
-                            Map<String, Object> args = [type: 'checkbox', name: item.name, value: option.value]
-                            if (item.defaultValue == option.value) {
-                                args.checked = 'checked'
+    private static void renderInput(builder, Item item, String clazz) {
+        builder.div(class: clazz) {
+            switch (item.responseType) {
+                case ResponseType.TEXT:
+                    switch (item.dataType) {
+                        case DataType.INT:
+                        case DataType.REAL:
+                            builder.input type: 'number', class: 'form-control input-sm', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                            break
+                        case DataType.DATE:
+                        case DataType.PDATE:
+                            builder.input type: 'date', class: 'form-control input-sm', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                            break
+                        case DataType.ST:
+                        default:
+                            builder.input type: 'text', class: 'form-control input-sm', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                            break
+                    }
+                    break;
+                case ResponseType.TEXTAREA:
+                    builder.textarea class: 'form-control input-sm', id: item.name, name: item.name, item.defaultValue ?: '', rows: 5
+                    break;
+                case ResponseType.SINGLE_SELECT:
+                    builder.select(class: 'form-control input-sm', id: item.name, name: item.name) {
+                        renderOptions(builder, item)
+                    }
+                    break;
+                case ResponseType.MULTI_SELECT:
+                    builder.select(class: 'form-control input-sm', id: item.name, name: item.name, multiple: '') {
+                        renderOptions(builder, item)
+                    }
+                    break;
+                case ResponseType.FILE:
+                    builder.input type: 'file', class: 'form-control input-sm', id: item.name, name: item.name, value: item.defaultValue ?: ''
+                    break;
+                case ResponseType.CHECKBOX:
+                    for (ResponseOption option in item.responseOptions) {
+                        builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'checkbox-inline' : 'checkbox') {
+                            label {
+                                Map<String, Object> args = [type: 'checkbox', name: item.name, value: option.value]
+                                if (item.defaultValue == option.value) {
+                                    args.checked = 'checked'
+                                }
+                                input args
+                                mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
                             }
-                            input args
-                            mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
                         }
                     }
-                }
-                break;
-            case ResponseType.RADIO:
-                for (ResponseOption option in item.responseOptions) {
-                    builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'radio-inline' : 'radio') {
-                        label {
-                            Map<String, Object> args = [type: 'radio', name: item.name, value: option.value]
-                            if (item.defaultValue == option.value) {
-                                args.checked = 'checked'
+                    break;
+                case ResponseType.RADIO:
+                    for (ResponseOption option in item.responseOptions) {
+                        builder.div(class: item.responseLayout == ResponseLayout.HORIZONTAL ? 'radio-inline' : 'radio') {
+                            label {
+                                Map<String, Object> args = [type: 'radio', name: item.name, value: option.value]
+                                if (item.defaultValue == option.value) {
+                                    args.checked = 'checked'
+                                }
+                                input args
+                                mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
                             }
-                            input args
-                            mkp.yieldUnescaped "$option.text <span class='text-muted'>[$option.value]</span>"
                         }
                     }
-                }
-                break;
-            case ResponseType.CALCULATION:
-                builder.div class: 'alert alert-info', {
-                    mkp.yield "This field is CALCULATION "
-                    code item.calculation
-                }
-                break;
-            case ResponseType.GROUP_CALCULATION:
-                builder.div class: 'alert alert-info', {
-                    mkp.yield "This field is GROUP_CALCULATION "
-                    code item.calculation
-                }
-                break;
-            case ResponseType.INSTANT_CALCULATION:
-                builder.div class: 'alert alert-info',  {
-                    mkp.yield "This field is INSTANT_CALCULATION "
-                    code item.calculation
-                }
-                break;
-            default:
-                builder.div class: 'alert alert-info', "This field is $item.responseType."
-                break;
+                    break;
+                case ResponseType.CALCULATION:
+                    builder.div class: 'alert alert-info', {
+                        mkp.yieldUnescaped "This field is CALCULATION<br/>"
+                        code item.calculation
+                    }
+                    break;
+                case ResponseType.GROUP_CALCULATION:
+                    builder.div class: 'alert alert-info', {
+                        mkp.yieldUnescaped "This field is GROUP_CALCULATION<br/>"
+                        code item.calculation
+                    }
+                    break;
+                case ResponseType.INSTANT_CALCULATION:
+                    builder.div class: 'alert alert-info',  {
+                        mkp.yieldUnescaped "This field is INSTANT_CALCULATION<br/>"
+                        code item.calculation
+                    }
+                    break;
+                default:
+                    builder.div class: 'alert alert-info', "This field is $item.responseType."
+                    break;
+            }
         }
     }
 
@@ -397,8 +401,8 @@ class CaseReportFormPreview {
         }
     }
 
-    private static void renderLabel(builder, Item item) {
-        builder.label(for: item.name) {
+    private static void renderLabel(builder, Item item, String clazz) {
+        builder.label(for: item.name, class: "control-label $clazz") {
             if (item.questionNumber) {
                 mkp.yield item.questionNumber
                 mkp.yield ' '
@@ -441,10 +445,17 @@ class CaseReportFormPreview {
         }
     }
 
-    private static void renderUnits(builder, Item item) {
+    private static void renderUnitsAndRightItemText(builder, Item item, boolean renderRightItemText) {
+        StringBuilder sb = new StringBuilder()
         if (item.units) {
-            builder.span("$item.units")
+            sb << "$item.units "
         }
+
+        if (item.rightItemText && renderRightItemText) {
+            sb << item.rightItemText
+        }
+
+        builder.span(class: 'col-md-3 units', sb.toString())
     }
 
     private static Map<String, Object> addDataItemPopover(Map<String, Object> args = [:], Item item) {
