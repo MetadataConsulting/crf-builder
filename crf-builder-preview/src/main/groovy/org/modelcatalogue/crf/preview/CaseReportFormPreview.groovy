@@ -51,6 +51,9 @@ class CaseReportFormPreview {
                             .question-number::after {
                                 content: " ";
                             }
+                            .control-label {
+                                text-align: left!important;
+                            }
                         '''.stripIndent().trim()
                     }
 
@@ -96,33 +99,14 @@ class CaseReportFormPreview {
                         }
                         div(class: 'tab-content') {
                             for (Section section in caseReportForm.sections.values()) {
+                                Map<String, Integer> counts = getCountOfItemsPerRow(section)
                                 Map<String, Object> args = [class: "row tab-pane", role: "tabpanel", id: getSectionIdFromLabel(section)]
                                 if (section == caseReportForm.sections.values().first()) {
                                     args['class'] = "${args['class']} active"
                                 }
                                 div(args) {
                                     div(class: "col-md-12") {
-                                        h1 {
-                                            span title: 'Title', section.title
-                                            mkp.yield " "
-                                            span(class: 'text-muted small pull-right', title: 'Label', section.label)
-                                        }
-                                        if (section.subtitle) {
-                                            h2(title: 'Subtitle') {
-                                                em { mkp.yieldUnescaped section.subtitle }
-                                            }
-                                        }
-                                        if (section.instructions) {
-                                            div(title: 'Instructions', class: 'alert alert-info') {
-                                                mkp.yieldUnescaped section.instructions
-                                            }
-                                        }
-                                        if (section.pageNumber) {
-                                            div(title: 'Page Number', class: 'alert alert-info') {
-                                                mkp.yieldUnescaped "The section starts at page "
-                                                strong section.pageNumber
-                                            }
-                                        }
+                                        printHeadersAndInstructions(builder, section)
 
                                         GridGroup grid = null
 
@@ -196,17 +180,22 @@ class CaseReportFormPreview {
                                                 continue
                                             }
 
+                                            Integer count = counts[item.name]
 
-                                            div(class: 'row') {
-                                                div(class: 'col-md-12') {
-                                                    form(class: 'form-horizontal') {
-                                                        div(addDataItemPopover(class: 'form-group form-group-sm', item)) {
-                                                            renderLabel(builder, item, 'col-md-3')
-                                                            renderInput(builder, item, 'col-md-6')
-                                                            renderUnitsAndRightItemText(builder, item, true)
-                                                        }
+                                            if (!item.columnNumber || item.columnNumber == 1) {
+                                                mkp.yieldUnescaped '<div class="row">'
+                                            }
+                                            div(class: getCellClassForCount(count)) {
+                                                form(class: 'form-horizontal') {
+                                                    div(addDataItemPopover(class: 'form-group form-group-sm', item)) {
+                                                        renderLabel(builder, item, 'col-md-3')
+                                                        renderInput(builder, item, 'col-md-6')
+                                                        renderUnitsAndRightItemText(builder, item, true)
                                                     }
                                                 }
+                                            }
+                                            if (!item.columnNumber || item.columnNumber == count) {
+                                                mkp.yieldUnescaped '</div>'
                                             }
                                         }
 
@@ -215,6 +204,32 @@ class CaseReportFormPreview {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private static void printHeadersAndInstructions(builder, Section section) {
+        builder.with {
+            h1 {
+                span title: 'Title', section.title
+                mkp.yield " "
+                span(class: 'text-muted small pull-right', title: 'Label', section.label)
+            }
+            if (section.subtitle) {
+                h2(title: 'Subtitle') {
+                    em { mkp.yieldUnescaped section.subtitle }
+                }
+            }
+            if (section.instructions) {
+                div(title: 'Instructions', class: 'alert alert-info') {
+                    mkp.yieldUnescaped section.instructions
+                }
+            }
+            if (section.pageNumber) {
+                div(title: 'Page Number', class: 'alert alert-info') {
+                    mkp.yieldUnescaped "The section starts at page "
+                    strong section.pageNumber
                 }
             }
         }
@@ -407,7 +422,8 @@ class CaseReportFormPreview {
     private static void renderLabel(builder, Item item, String clazz) {
         builder.label(for: item.name, class: "control-label $clazz") {
             if (item.questionNumber) {
-                span(class: 'question-number pull-left', item.questionNumber)
+                mkp.yield(item.questionNumber)
+                mkp.yield ' '
             }
             if (item.leftItemText) {
                 mkp.yield(item.leftItemText)
@@ -470,5 +486,23 @@ class CaseReportFormPreview {
                 'data-container': 'body',
                 'data-viewport': "#${getSectionIdFromLabel(item.section)}"
         return args
+    }
+
+
+    private static Map<String, Integer> getCountOfItemsPerRow(Section section) {
+        Map<String, Integer> counts = [:].withDefault { 1 }
+
+        List<Item> currentRow = []
+        for (Item item in section.items.values()) {
+            if ((item.columnNumber ?: 1) == 1) {
+                for (Item i in currentRow) {
+                    counts[i.name] = currentRow.size()
+                }
+                currentRow.clear()
+            }
+            currentRow << item
+        }
+
+        return counts
     }
 }
