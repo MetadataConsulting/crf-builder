@@ -5,6 +5,7 @@ import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.DisplayStatus
 import org.modelcatalogue.crf.model.GridGroup
+import org.modelcatalogue.crf.model.Group
 import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ResponseLayout
 import org.modelcatalogue.crf.model.ResponseOption
@@ -115,6 +116,17 @@ class CaseReportFormPreview {
                                 div(args) {
                                     div(class: "col-md-12") {
                                         renderViolations(builder, validate(section))
+
+                                        for (Group group in section.groups.values()) {
+                                            if (!(group instanceof GridGroup)) {
+                                                Set<ConstraintViolation> errors = validate(group)
+                                                if (errors) {
+                                                    div(class: 'alert alert-danger', "There are errors in $group.label group")
+                                                    renderViolations(builder, errors)
+                                                }
+                                            }
+                                        }
+
                                         printHeadersAndInstructions(builder, section)
 
                                         GridGroup grid = null
@@ -234,7 +246,7 @@ class CaseReportFormPreview {
         }
     }
 
-    private Set<ConstraintViolation> validate(Object what) {
+    private static Set<ConstraintViolation> validate(Object what) {
         try {
             Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
             return validator.validate(what)
