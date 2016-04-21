@@ -10,7 +10,7 @@ import spock.lang.Unroll
 @Unroll
 class CaseReportFormPreviewSpec extends Specification {
 
-    def "test preview rendered for #name"() {
+    def "test preview rendered for #name should contain #errors errors"() {
         URL complexFormFileURL = CaseReportFormPreviewSpec.getResource(name + '.crf')
 
         expect:
@@ -34,14 +34,30 @@ class CaseReportFormPreviewSpec extends Specification {
         then:
         html
 
-        when:
+        when: "when I parse HTML"
         Document document = Jsoup.parse(html)
 
-        then:
+        then: "it is parsed OK"
+        noExceptionThrown()
         document
 
+        and: "there is #errors warnings"
+        document.select('.alert-danger').size() == errors
+
+        and: "there are three tabs"
+        document.select('[role=tab]').size() == 3
+
+        and: "there are some input fields"
+        document.select('textarea').size() == 1
+        document.select('input[type=file]').size() == 1
+        document.select('input[type=text]').size() == 25
+        document.select('input[type=date]').size() == 1
+        document.select('input[type=number]').size() == 4
+
         where:
-        name << ['valid', 'invalid']
+        errors  | name
+        0       | 'valid'
+        8       | 'invalid'
     }
 
 }

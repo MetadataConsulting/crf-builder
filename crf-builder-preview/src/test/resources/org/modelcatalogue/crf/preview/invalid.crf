@@ -490,7 +490,7 @@ section('III Other') {
 
     grid ('Other Body System Site') {
         header 'Other Body System / Site'
-        rows 0
+        rows 3
         text('OTHERBODYSYSTEM{&}') {
             description 'Other Body System/Site Description'
             question 'Other Body System/Site:'
