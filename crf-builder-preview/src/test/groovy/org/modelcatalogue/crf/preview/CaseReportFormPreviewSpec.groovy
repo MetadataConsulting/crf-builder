@@ -5,11 +5,13 @@ import org.jsoup.nodes.Document
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.serializer.CaseReportFormSerializer
 import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class CaseReportFormPreviewSpec extends Specification {
 
-    def "test preview rendered"() {
-        URL complexFormFileURL = CaseReportFormPreviewSpec.getResource('samplePhysicalExamEnglish.crf')
+    def "test preview rendered for #name"() {
+        URL complexFormFileURL = CaseReportFormPreviewSpec.getResource(name + '.crf')
 
         expect:
         complexFormFileURL
@@ -22,12 +24,12 @@ class CaseReportFormPreviewSpec extends Specification {
 
         File testFolder = new File(System.getProperty('user.dir'), 'crf-builder-preview')
         testFolder.mkdirs()
-        File testFile = new File(testFolder, 'crf-builder-preview.html')
+        File testFile = new File(testFolder, name + '.html')
         testFile.text = html
 
         println "Test file created at: $testFile.canonicalPath"
 
-        new CaseReportFormSerializer(form).write(new File(testFolder, 'crf-builder-preview.xls').newOutputStream())
+        new CaseReportFormSerializer(form).write(new File(testFolder, name + '.xls').newOutputStream())
 
         then:
         html
@@ -38,6 +40,8 @@ class CaseReportFormPreviewSpec extends Specification {
         then:
         document
 
+        where:
+        name << ['valid', 'invalid']
     }
 
 }

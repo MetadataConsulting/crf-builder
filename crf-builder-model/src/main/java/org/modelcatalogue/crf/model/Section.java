@@ -1,12 +1,11 @@
 package org.modelcatalogue.crf.model;
 
+import org.modelcatalogue.crf.model.validation.AlphaNumeric;
+
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import java.util.*;
-
-import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_NO_SPACES_PATTERN;
 
 public class Section extends AbstractItemsContainer implements HasPageNumber {
 
@@ -25,7 +24,7 @@ public class Section extends AbstractItemsContainer implements HasPageNumber {
      *
      * A CRF must have at least one section.
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_NO_SPACES_PATTERN) private String label;
+    @NotNull @Size(min = 1, max = 255) @AlphaNumeric private String label;
 
     /**
      * The value in this field will be displayed at the top of each page when a user is performing data entry, as well

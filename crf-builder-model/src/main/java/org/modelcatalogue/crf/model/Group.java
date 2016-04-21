@@ -1,11 +1,12 @@
 package org.modelcatalogue.crf.model;
 
+import org.modelcatalogue.crf.model.validation.AlphaNumeric;
+import org.modelcatalogue.crf.model.validation.AlphaNumericNoSpaces;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import static org.modelcatalogue.crf.model.validation.ValidationConstants.ALPHA_NUMERIC_NO_SPACES_PATTERN;
 
 public class Group extends AbstractItemsContainer implements HasDisplayStatus {
 
@@ -26,7 +27,7 @@ public class Group extends AbstractItemsContainer implements HasDisplayStatus {
      * We suggest providing records in this worksheet only if you are going to use Groups for Items grouping on Items
      * worksheet.
      */
-    @NotNull @Size(min = 1, max = 255) @Pattern(regexp = ALPHA_NUMERIC_NO_SPACES_PATTERN) private String label;
+    @NotNull @Size(min = 1, max = 255) @AlphaNumeric private String label;
 
     /**
      * Used in conjunction with Dynamics in Rules. If set to HIDE, the item group will not appear in the CRF when a user
@@ -42,7 +43,7 @@ public class Group extends AbstractItemsContainer implements HasDisplayStatus {
      *
      * Note that the GROUP is the container for items and that items within the group can have nested SHOW/HIDE logic as well. If a hidden group is shown but some of the items within that group have been set to HIDE within the ITEMS worksheet, additional logic will have to be built for those individual items. If all items within the group are set to SHOW within the items worksheet, then showing the time group will show all items.
      */
-    @NotNull private DisplayStatus displayStatus;
+    @NotNull private DisplayStatus displayStatus = DisplayStatus.SHOW;
 
     /**
      * As all items must belong to same section it make sense to keep the section refrence from the group instead from

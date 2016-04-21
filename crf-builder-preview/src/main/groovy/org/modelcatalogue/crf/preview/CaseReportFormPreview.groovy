@@ -11,6 +11,10 @@ import org.modelcatalogue.crf.model.ResponseOption
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.Section
 
+import javax.validation.ConstraintViolation
+import javax.validation.Validation
+import javax.validation.Validator
+
 class CaseReportFormPreview {
 
     private static final String UNTITLED_FORM_NAME = 'Untitled Case Report Form'
@@ -22,6 +26,7 @@ class CaseReportFormPreview {
 
     void write(OutputStream out) {
         StreamingMarkupBuilder markupBuilder = new StreamingMarkupBuilder()
+
         out <<  markupBuilder.bind { builder ->
             mkp.yieldUnescaped '<!DOCTYPE html>'
             html(lang:'en') {
@@ -86,6 +91,9 @@ class CaseReportFormPreview {
                                 mkp.yield caseReportForm.revisionNotes
                             }
                         }
+
+                        renderViolations(builder, validate(caseReportForm))
+
                         ul(class: 'nav nav-tabs', role: 'tablist') {
                             for (Section section in caseReportForm.sections.values()) {
                                 Map<String, Object> args = [role: 'presentation']
@@ -106,6 +114,7 @@ class CaseReportFormPreview {
                                 }
                                 div(args) {
                                     div(class: "col-md-12") {
+                                        renderViolations(builder, validate(section))
                                         printHeadersAndInstructions(builder, section)
 
                                         GridGroup grid = null
@@ -132,6 +141,7 @@ class CaseReportFormPreview {
                                                         }
                                                     }
                                                 }
+                                                renderViolations(builder, validate(grid))
                                             }
 
                                             if (item.header) {
@@ -206,6 +216,39 @@ class CaseReportFormPreview {
                     }
                 }
             }
+        }
+    }
+
+    private static void renderViolations(builder, Set<ConstraintViolation> constraintViolations) {
+        if (constraintViolations) {
+            builder.div(class: 'row') {
+                for (ConstraintViolation violation in constraintViolations) {
+                    div(class: 'col-md-12') {
+                        div(class: 'alert alert-danger') {
+                            mkp.yield "'$violation.propertyPath' "
+                            mkp.yield violation.message
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private Set<ConstraintViolation> validate(Object what) {
+        try {
+            Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+            return validator.validate(what)
+        } catch (e) {
+            System.err.println """
+                Cannot create validator: $e
+                Is there any Java Validation API implementation present in your application?
+
+                You can add for example following libaries to you project to enable validaton:
+                    compile 'javax.el:javax.el-api:2.2.5'
+                    compile 'org.glassfish.web:javax.el:2.2.4'
+                    compile 'org.hibernate:hibernate-validator:5.1.3.Final'
+            """.stripIndent().trim()
+            return Collections.emptySet()
         }
     }
 
