@@ -159,7 +159,9 @@ class CaseReportFormPreview {
                                             if (item.header) {
                                                 div(class: 'row') {
                                                     div(class: 'col-md-12') {
-                                                        h3 item.header, title: "Header"
+                                                        h3 title: "Header", {
+                                                            mkp.yieldUnescaped item.header
+                                                        }
                                                     }
                                                 }
                                             }
@@ -167,7 +169,9 @@ class CaseReportFormPreview {
                                                 div(class: 'row') {
                                                     div(class: 'col-md-12') {
                                                         h4 title: "Subheader", {
-                                                            strong item.subheader
+                                                            strong {
+                                                                mkp.yieldUnescaped item.subheader
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -510,7 +514,7 @@ class CaseReportFormPreview {
                 mkp.yield ' '
             }
             if (item.leftItemText) {
-                mkp.yield(item.leftItemText)
+                mkp.yieldUnescaped(item.leftItemText)
                 mkp.yield ' '
             }
             if (item.required) {
@@ -557,7 +561,9 @@ class CaseReportFormPreview {
             sb << item.rightItemText
         }
 
-        builder.span(class: 'col-md-3 units', sb.toString())
+        builder.span(class: 'col-md-3 units') {
+            mkp.yieldUnescaped sb.toString()
+        }
     }
 
     private static Map<String, Object> addDataItemPopover(Map<String, Object> args = [:], Item item, Set<ConstraintViolation> violations) {
