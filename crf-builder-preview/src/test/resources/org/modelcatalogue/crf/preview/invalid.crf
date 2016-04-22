@@ -56,7 +56,7 @@ section('x' * 256) {
             validate('Temperature out of expected range of 95-110 degrees F.') {
                 range(95,110)
             }
-            pageNumber 2
+            pageNumber "2"
         }
 
         text('PULSE') {

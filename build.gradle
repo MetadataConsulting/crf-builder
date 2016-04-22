@@ -26,7 +26,7 @@ subprojects {
     }
 
     // don't forget to update version in CaseReportFormSerializer
-    version = '3.2-rc1'
+    version = '3.2.0-rc2'
 
     jar {
         manifest.attributes provider: 'gradle'
