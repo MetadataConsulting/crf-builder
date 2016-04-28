@@ -102,7 +102,7 @@ class CaseReportFormPreview {
                                     args.class = 'active'
                                 }
                                 li(args) {
-                                    a(section.label, 'data-toggle': 'tab', role: 'tab', href: "#${getSectionIdFromLabel(section)}", 'aria-controlls': getSectionIdFromLabel(section))
+                                    a(section.title ?: section.label, 'data-toggle': 'tab', role: 'tab', href: "#${getSectionIdFromLabel(section)}", 'aria-controls': getSectionIdFromLabel(section))
                                 }
                             }
                         }
