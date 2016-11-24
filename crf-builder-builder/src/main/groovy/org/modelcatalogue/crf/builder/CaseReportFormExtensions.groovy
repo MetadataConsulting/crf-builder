@@ -401,6 +401,16 @@ class CaseReportFormExtensions {
         item
     }
 
+    /**
+     * Mutates the current section to sort it's items by question numbers.
+     */
+    static void sort(Section section, Map<String, Item> items) {
+        if (items != section.items) {
+            throw new IllegalArgumentException("Only items from current section can be sorted")
+        }
+        section.sortItemsByQuestionNumber()
+    }
+
 
     /**
      * Finds or creates new single select item with predefined type SINGLE_SELECT.

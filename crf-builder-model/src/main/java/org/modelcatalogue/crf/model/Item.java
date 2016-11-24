@@ -824,4 +824,11 @@ public class Item implements Text, Textarea, SingleSelect, Radio, MultiSelect, C
         this.validation = expression.getExpression();
         this.validationErrorMessage = expression.getMessage();
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

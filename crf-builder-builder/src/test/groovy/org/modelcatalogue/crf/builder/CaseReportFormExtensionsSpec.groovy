@@ -292,4 +292,146 @@ class CaseReportFormExtensionsSpec extends Specification {
 
     }
 
+    def "sort items"() {
+        CaseReportForm form = CaseReportForm.build('Sort Test') {
+            section('with_question_numbers') {
+                text 'four', {
+                    questionNumber '4'
+                }
+                text 'one', {
+                    questionNumber '0'
+                }
+                text 'three', {
+                    questionNumber '3'
+                }
+                text 'two', {
+                    questionNumber '2'
+                }
+                sort items
+            }
+        }
+
+        expect:
+        form.sections
+
+        when:
+        List<Item> items = form.sections.values().first().items.values().toList()
+
+        then:
+        items
+        items.size() == 4
+        items[0].name == 'one'
+        items[1].name == 'two'
+        items[2].name == 'three'
+        items[3].name == 'four'
+    }
+
+    def "sort items with dot notation"() {
+        CaseReportForm form = CaseReportForm.build('Sort Test') {
+            section('with_question_numbers') {
+                text 'four', {
+                    questionNumber '3'
+                }
+                text 'one', {
+                    questionNumber '1'
+                }
+                text 'three', {
+                    questionNumber '2.2'
+                }
+                text 'two', {
+                    questionNumber '2.1'
+                }
+                sort items
+            }
+        }
+
+        expect:
+            form.sections
+
+        when:
+            List<Item> items = form.sections.values().first().items.values().toList()
+
+        then:
+            items
+            items.size() == 4
+            items[0].name == 'one'
+            items[1].name == 'two'
+            items[2].name == 'three'
+            items[3].name == 'four'
+    }
+
+    def "questions stays together"() {
+        CaseReportForm form = CaseReportForm.build('Sort Test') {
+            section('with_question_numbers') {
+                text 'four', {
+                    questionNumber '3'
+                }
+                text 'one', {
+                    questionNumber '1'
+                }
+                text 'two', {
+                    questionNumber '2'
+                }
+                text 'three'
+                sort items
+            }
+        }
+
+        expect:
+            form.sections
+
+        when:
+            List<Item> items = form.sections.values().first().items.values().toList()
+
+        then:
+            items
+            items.size() == 4
+            items[0].name == 'one'
+            items[1].name == 'two'
+            items[2].name == 'three'
+            items[3].name == 'four'
+    }
+
+    def "sort items with more sequences"() {
+        CaseReportForm form = CaseReportForm.build('Sort Test') {
+            section('with_question_numbers') {
+                text 'four', {
+                    questionNumber '4'
+                }
+                text 'one', {
+                    questionNumber '1'
+                }
+                text 'three', {
+                    questionNumber '3'
+                }
+                text 'two', {
+                    questionNumber '2'
+                }
+                text 'five', {
+                    questionNumber '1'
+                }
+                text 'six', {
+                    questionNumber '2'
+                }
+                sort items
+            }
+        }
+
+        expect:
+            form.sections
+
+        when:
+            List<Item> items = form.sections.values().first().items.values().toList()
+
+        then:
+            items
+            items.size() == 6
+            items[0].name == 'one'
+            items[1].name == 'two'
+            items[2].name == 'three'
+            items[3].name == 'four'
+            items[4].name == 'five'
+            items[5].name == 'six'
+    }
+
 }

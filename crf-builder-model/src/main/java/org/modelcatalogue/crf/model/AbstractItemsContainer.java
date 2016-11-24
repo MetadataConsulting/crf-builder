@@ -1,9 +1,9 @@
 package org.modelcatalogue.crf.model;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 abstract class AbstractItemsContainer implements ItemContainer {
 
@@ -77,5 +77,52 @@ abstract class AbstractItemsContainer implements ItemContainer {
     @Override
     public InstantCalculation instantCalculation(String name) {
         return item(ResponseType.INSTANT_CALCULATION, name);
+    }
+
+    public void sortItemsByQuestionNumber() {
+        SortedMap<Long, Item> itemsByIndex = new TreeMap<Long, Item>();
+        Set<String> questionNumbers = new HashSet<String>(items.size());
+        int offset = 0;
+
+        long lastIndex = 0;
+        for (Item item : items.values()) {
+            String questionNumber = item.getQuestionNumber();
+            if (questionNumber != null) {
+                if (questionNumbers.contains(questionNumber)) {
+                    offset++;
+                }
+                questionNumbers.add(questionNumber);
+                long index = toQuestionNumberIndex(offset, questionNumber);
+                lastIndex = index;
+                itemsByIndex.put(index, item);
+            } else {
+                itemsByIndex.put(++lastIndex, item);
+            }
+        }
+
+        Map<String, Item> result = new LinkedHashMap<String, Item>(items.size());
+        for (Item item : itemsByIndex.values()) {
+            result.put(item.getName(), item);
+        }
+        this.items = result;
+    }
+
+    private static Pattern SECOND_LEVEL_QUESTION = Pattern.compile("(\\d+)\\.(\\d+)");
+
+    /**
+     * If the string is just number itreturns the number times 1000.
+     * If the string contains two numbers separated by dot it returns the first number times 1000 plus the second number.
+     */
+    private static long toQuestionNumberIndex(int offset, String string) {
+        if (string.matches("\\d+")) {
+            return offset * 1000000000 + Integer.parseInt(string, 10) * 1000000;
+        }
+
+        Matcher matcher = SECOND_LEVEL_QUESTION.matcher(string);
+        if (matcher.matches()) {
+            return offset * 1000000000 + Integer.parseInt(matcher.group(1), 10) * 1000000 + Integer.parseInt(matcher.group(2), 10) * 1000;
+        }
+
+        return offset * 1000000000;
     }
 }
