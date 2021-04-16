@@ -1,5 +1,21 @@
 # OpenClinica Case Report Forms Builder
 
+## To Publish
+
+To publish run `./gradlew publish`
+
+You will need to have an https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/ec2-iam-roles.html[AWS credentials provider].
+
+For developers publishing directly from their machine it typically means either:
+
+-  Java system properties: `aws.accessKeyId` and `aws.secretAccessKey.
+- Environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+- You install [AWS CLI](https://aws.amazon.com/cli/), you run `aws configure` you enter your access key id and secret and it creates a `~/.aws/credentials` file which the Java SDK is able to access.
+
+We use the https://plugins.gradle.org/plugin/ai.clarity.codeartifact[Codeartifact Gradle plugin] to abstract the token setup in the repository.
+
+If you want to publish from AWS Code Build, we should provide the IAM role associated with the Code Build Project the CodeArtifact policy.
+
 ## Model
 
 The model represent the structure of the Case Report Form (CRF) focused on preventing the common errors when creating
