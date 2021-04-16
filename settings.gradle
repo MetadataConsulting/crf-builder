@@ -1,1 +1,15 @@
-include 'crf-builder-model', 'crf-builder-builder', 'crf-builder-serializer', 'crf-builder-preview'
+plugins {
+    id "com.gradle.enterprise" version "3.6.1"
+}
+rootProject.name = 'crf-builder'
+include('crf-builder-model')
+include('crf-builder-builder')
+include('crf-builder-serializer')
+include('crf-builder-preview')
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+        publishAlways()
+    }
+}
