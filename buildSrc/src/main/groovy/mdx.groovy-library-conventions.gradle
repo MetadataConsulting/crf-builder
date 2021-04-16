@@ -70,7 +70,7 @@ publishing {
             project.hasProperty('awsCodeArtifactRepository')) {
         repositories {
             maven {
-                url "https://${awsCodeArtifactDomain}-${awsCodeArtifactOwner}.d.codeartifact.us-east-1.amazonaws.com/maven/${awsCodeArtifactRepository}/"
+                url "https://${awsCodeArtifactDomain}-${awsCodeArtifactOwner}.d.codeartifact.${awsCodeArtifactRegion}.amazonaws.com/maven/${awsCodeArtifactRepository}/"
             }
         }
     }
