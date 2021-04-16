@@ -1,0 +1,78 @@
+plugins {
+    id 'groovy'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+ext {
+    projectVersion = '3.2.0-SNAPSHOT' // don't forget to update version in CaseReportFormSerializer
+    isReleaseVersion = !projectVersion.endsWith('SNAPSHOT')
+}
+
+
+version projectVersion
+group 'org.modelcatalogue'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:2.4.10' // same version as Grails 2.5.6
+    testImplementation 'org.spockframework:spock-core:1.3-groovy-2.4'
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+Closure pomInfo = {
+    name = project.name
+    description = projectDesc
+    url = projectUrl
+    licenses {
+        license {
+            name = 'The Apache License, Version 2.0'
+            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+        }
+    }
+    developers {
+        developer {
+            name = developerName
+            email = developerEmail
+            organization = 'Metadata Works'
+            organizationUrl = 'https://metadataworks.co.uk'
+        }
+    }
+    scm {
+        connection = "scm:$projectGit".toString()
+        developerConnection = "scm:$projectGit".toString()
+        url = projectUrl
+    }
+}
+
+publishing {
+    publications {
+        groovyMaven(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+            from components.java
+            pom pomInfo
+        }
+    }
+    if (project.hasProperty('awsCodeArtifactDomain') &&
+            project.hasProperty('awsCodeArtifactOwner') &&
+            project.hasProperty('awsCodeArtifactRepository')) {
+        repositories {
+            maven {
+                url "https://${awsCodeArtifactDomain}-${awsCodeArtifactOwner}.d.codeartifact.${awsCodeArtifactRegion}.amazonaws.com/maven/${awsCodeArtifactRepository}/"
+            }
+        }
+    }
+
+}

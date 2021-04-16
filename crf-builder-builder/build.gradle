@@ -1,4 +1,8 @@
+plugins {
+    id "ai.clarity.codeartifact" version "0.0.10"
+    id 'mdx.groovy-library-conventions'
+}
+
 dependencies {
-    compile project(':crf-builder-model')
-    compile 'org.codehaus.groovy:groovy-all:2.4.6'
+    api project(':crf-builder-model')
 }
