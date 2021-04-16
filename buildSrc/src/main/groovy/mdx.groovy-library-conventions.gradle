@@ -55,6 +55,11 @@ Closure pomInfo = {
     }
 }
 
+boolean isRunningInGithubActions = System.getenv('GITHUB_RUN_ID')
+boolean hasAwsSys = System.getProperty('aws.accessKeyId') && System.getProperty('aws.secretAccessKey')
+boolean hasAwsEnv = System.getenv('AWS_ACCESS_KEY_ID') && System.getenv('AWS_SECRET_ACCESS_KEY')
+boolean hasCodeArtifactProperties = project.hasProperty('awsCodeArtifactDomain') && project.hasProperty('awsCodeArtifactOwner') && project.hasProperty('awsCodeArtifactRepository') && project.hasProperty('awsCodeArtifactRegion')
+
 publishing {
     publications {
         groovyMaven(MavenPublication) {
@@ -65,9 +70,7 @@ publishing {
             pom pomInfo
         }
     }
-    if (project.hasProperty('awsCodeArtifactDomain') &&
-            project.hasProperty('awsCodeArtifactOwner') &&
-            project.hasProperty('awsCodeArtifactRepository')) {
+    if (hasCodeArtifactProperties && (!isRunningInGithubActions || (isRunningInGithubActions && (hasAwsSys || hasAwsEnv)))) {
         repositories {
             maven {
                 url "https://${awsCodeArtifactDomain}-${awsCodeArtifactOwner}.d.codeartifact.${awsCodeArtifactRegion}.amazonaws.com/maven/${awsCodeArtifactRepository}/"
