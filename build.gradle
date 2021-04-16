@@ -32,8 +32,6 @@ subprojects {
         manifest.attributes provider: 'gradle'
     }
 
-
-
     // publishing
     publishing {
         publications {
